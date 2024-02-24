@@ -128,40 +128,6 @@ def return_comments_group_no_filter(group='klops39', days_=1):
         aboba += 1
 
 
-# def return_comments_group_filter(group='klops39', users=(), days_=1):
-#     ids = take_id_of_all_posts(take_page_data(group, days_))
-#     cnt = take_count_of_comments_of_all_posts(take_page_data(group, days_))
-#
-#     aboba = 1
-#     for i, j in zip(ids, cnt):
-#         if j != 0:
-#             try:
-#                 data = take_comments_g(group, i, j)
-#                 for key in data:
-#                     user = take_user_domain(take_user_data(f'id{key["from_id"]}'))
-#                     date = datetime.datetime.fromtimestamp(key['date']).strftime('%d.%m.%Y %H:%M:%S')
-#                     text = key["text"]
-#
-#                     # Проверяем наличие ключа 'owner_id'
-#                     post_id = key.get("post_id", "")
-#                     owner_id = key.get("owner_id", "")
-#                     if post_id and owner_id:
-#                         post = f'{group}?w=wall{owner_id}_{post_id}'
-#                     else:
-#                         post = f'{group}?w=wall{key.get("owner_id", "")}_{key.get("post_id", "")}'
-#                     if user in users:
-#                         yield [f'Автор: {user}'
-#                                f'Дата: {date}'
-#                                f'Текст: {text}'
-#                                f'Запись: {post}']
-#                     else:
-#                         pass
-#             except (TypeError, IndexError, KeyError):
-#                 pass
-#         else:
-#             pass
-#         print(f"{aboba} запись проверена")
-#         aboba += 1
 def return_comments_group_filter(group='klops39', users=(), days_=1):
     ids = take_id_of_all_posts(take_page_data(group, days_))
     cnt = take_count_of_comments_of_all_posts(take_page_data(group, days_))
@@ -184,7 +150,7 @@ def return_comments_group_filter(group='klops39', users=(), days_=1):
                         post = f'{group}?w=wall{key.get("owner_id", "")}_{key.get("post_id", "")}'
 
                     if user in users:
-                        yield [f'Автор: {user}',
+                        yield [f'Автор: https://vk.com/{user}',
                                 f'Дата: {date}',
                                 f'Текст: {text}',
                                 f'Запись: {post}']
@@ -193,11 +159,13 @@ def return_comments_group_filter(group='klops39', users=(), days_=1):
                 pass
         else:
             pass
-        print(f"{aboba} запись проверена")
+        print(f"{aboba} запись проверена\n")
         aboba += 1
 
 
-# group_url = 'klops39'
-# temp = return_comments_group_filter(group_url, 'lord_velzevul', 1)
+# temp = return_comments_group_filter('klops39', ('tyson39', 'id98002420', 'id269762109'), 1)
 # for post_ in temp:
-#     print(*post_)
+#     for item in post_:
+#         print(item)
+#     print()
+

@@ -40,21 +40,6 @@ def take_page_data(domain, days_):
         time.sleep(0.5)
 
 
-def check_private_page(data):
-    try:
-        if data['error']['error_msg'] == 'Access denied: user hid his wall from accessing from outside':
-            return True
-    except KeyError:
-        return False
-
-
-def take_count_of_all_posts(data):
-    try:
-        return data['response']['count']
-    except KeyError:
-        return 'нет данных'
-
-
 def take_id_of_all_posts(data):
     all_id = []
     for i in data:

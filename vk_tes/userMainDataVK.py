@@ -126,4 +126,3 @@ def return_all_user_info(domain):
     phone = f'Телефон: {take_user_mobile(data)}'
     site = f'Сайт: {take_user_web_site(data)}'
     return [url, name, bdate, city, phone, site]
-

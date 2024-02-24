@@ -31,6 +31,14 @@ def group_empty(data):
         return True
 
 
+def group_is_open(data):
+    try:
+        if data['response'][0]['activity'] == 'Closed community':
+            return False
+    except KeyError:
+        return True
+
+
 def take_group_id(data):
     try:
         group_id = data['response'][0]['id']
@@ -116,8 +124,3 @@ def return_all_group_main_data(domain):
 
     except (KeyError, IndexError, TypeError):
         return False
-
-
-temp = take_group_data('ыфавфаыаа')
-answ = group_empty(temp)
-print()

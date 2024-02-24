@@ -8,16 +8,7 @@ def take_groups(file='/Users/a.sagitovich/programming/BFU/TES/vk_tes/list_one.xl
     page = book.active
 
     list_ = []
-    for i in page['C']:
+    for i in page['A']:
         if i.value is not None:
             list_.append(i.value)
-
-    # for i in page['B']:
-    #     if i.value is not None:
-    #         list_.append(i.value)
-
-    # for i in page['A']:
-    #     if i.value is not None:
-    #         list_.append(i.value)
-
     return list_

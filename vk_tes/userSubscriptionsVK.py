@@ -1,6 +1,6 @@
 import time
 import requests
-from userMainDataVK import user_empty, take_user_id, take_user_data, take_user_domain
+from userMainDataVK import take_user_id, take_user_data
 
 
 def take_user_subscriptions_data(domain):  # работает с url, id и доменом
@@ -76,29 +76,3 @@ def take_user_group_url_name(data):
     except KeyError:
         pass
     return sorted(all_groups_url, key=len)
-
-
-def info_collection(data, domain):
-    temp_data = take_user_data(domain)
-    output_info = f'Подписки пользователя https://vk.com/{take_user_domain(temp_data)}:\n'
-    output_info += take_user_groups(data)
-    return output_info
-
-
-def print_info(info, domain):
-    print(info_collection(info, domain))
-
-
-def main():
-    user = input('Пользователь ВКонтакте: ')
-    try:
-        data = take_user_subscriptions_data(user)
-        if user_empty(data):
-            print()
-            print_info(data, user)
-            print('Печать данных завершена!')
-        else:
-            print(f'Пользователя с таким id не существует!')
-    except...:
-        print(f'Ошибка! Невозможно получить данные.')
-

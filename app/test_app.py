@@ -5,10 +5,11 @@ from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QThread
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
 
-from vk_tes.postsInfo import return_posts, take_page_data, check_private_page
+from vk_tes.postsInfo import return_posts
+from vk_tes.getCommentsFromGroup import return_comments_group_filter
 from vk_tes.userMainDataVK import return_all_user_info, user_empty, take_user_data
-from vk_tes.groupMainDataVK import return_all_group_main_data, group_empty, take_group_data
 from vk_tes.userSubscriptionsVK import take_user_subscriptions_data, take_user_group_url_name
+from vk_tes.groupMainDataVK import return_all_group_main_data, group_empty, take_group_data, group_is_open
 
 
 class TES_Main(QMainWindow):
@@ -222,7 +223,7 @@ class TES_UserPosts(QWidget):
 
     def __init__(self, parent_window):
         super().__init__()
-        self.worker = (self, self)
+        self.VK_Posts_Writer = (self, self)
         uic.loadUi('vkUserPosts.ui', self)
         self.setWindowTitle('TES VK-ПОЛЬЗОВАТЕЛИ-ЗАПИСИ')
 
@@ -239,22 +240,22 @@ class TES_UserPosts(QWidget):
         try:
             days = int(days)
             if (not name) or (user_empty(take_user_data(name)) is False):
-                self.posts_info.setText('')  # очищаем scrollArea
+                self.posts_info.setText('')
                 self.error_msg.setText('неверный домен или url страницы')
 
             elif days > 1100:
-                self.posts_info.setText('')  # очищаем scrollArea
+                self.posts_info.setText('')
                 self.error_msg.setText('выберете меньший диапазон времени')
             else:
                 self.error_msg.setText('')
-                self.worker = VK_Posts_Writer(name, days)
-                self.worker.data_ready.connect(self.update_label)
-                self.worker.loading_finished.connect(self.loading_finished)
-                self.worker.start()
+                self.VK_Posts_Writer = VK_Posts_Writer(name, days)
+                self.VK_Posts_Writer.data_ready.connect(self.update_label)
+                self.VK_Posts_Writer.loading_finished.connect(self.loading_finished)
+                self.VK_Posts_Writer.start()
                 self.error_msg.setText('идёт получение...')
 
         except (ValueError, TypeError):
-            self.posts_info.setText('')  # очищаем scrollArea
+            self.posts_info.setText('')
             self.error_msg.setText('неверный временной диапазон')
 
     def update_label(self, text):
@@ -267,6 +268,27 @@ class TES_UserPosts(QWidget):
         self.close()
         self.parent_window.show()
         self.windowClosed.emit()
+
+
+class VK_UserCommGroup_Writer(QThread):
+    data_ready = pyqtSignal(str)
+    loading_finished = pyqtSignal()
+
+    def __init__(self, group_domain, user_check, days):
+        super().__init__()
+        self.group_domain = group_domain
+        self.user_check = user_check
+        self.days = days
+
+    def run(self):
+        result = return_comments_group_filter(self.group_domain, self.user_check, self.days)
+        text = ''
+        for line in result:
+            for i in line:
+                text += (i + '\n')
+            text += (96 * '-' + '\n')
+            self.data_ready.emit(text)
+        self.loading_finished.emit()
 
 
 class TES_UserComments(QWidget):
@@ -316,6 +338,7 @@ class TES_UserCommGroup(QWidget):
 
     def __init__(self, parent_window):
         super().__init__()
+        self.VK_UserCommGroup_Writer = (self, self, self)
         uic.loadUi('vkUserCommGroup.ui', self)
         self.setWindowTitle('TES VK-ПОЛЬЗОВАТЕЛИ-КОММЕНТАРИИ')
 
@@ -326,35 +349,42 @@ class TES_UserCommGroup(QWidget):
         self.check_comm.clicked.connect(self.click)
 
     def click(self):
-        name = self.input_url.text()  # Получим текст из поля ввода
+        group = self.input_url.text()  # Получим текст из поля ввода
+        user_check = self.user_who_check.toPlainText()
         days = self.day_input.text()  # Получим количество дней
         self.error_msg.setText('')
         self.comm_info.setText('')
         try:
             days = int(days)
-            if not name:
+            if not group:
                 self.comm_info.setText('')
                 self.error_msg.setText('не введён домен или url страницы')
-            elif group_empty(take_group_data(name)) is False:
+            elif group_empty(take_group_data(group)) is False:
                 self.comm_info.setText('')
                 self.error_msg.setText('сообщества не существует')
-            elif check_private_page(take_page_data(name, days)):
+            elif group_is_open(take_group_data(group)) is False:
                 self.comm_info.setText('')
                 self.error_msg.setText('сообщество закрыто')
             elif days > 1100:
-                self.posts_info.setText('')
+                self.comm_info.setText('')
                 self.error_msg.setText('выберете меньший диапазон времени')
             else:
                 self.error_msg.setText('')
-                self.worker = VK_Posts_Writer(name, days)
-                self.worker.data_ready.connect(self.update_label)
-                self.worker.loading_finished.connect(self.loading_finished)
-                self.worker.start()
+                self.VK_UserCommGroup_Writer = VK_UserCommGroup_Writer(group, user_check, days)
+                self.VK_UserCommGroup_Writer.data_ready.connect(self.update_label)
+                self.VK_UserCommGroup_Writer.loading_finished.connect(self.loading_finished)
+                self.VK_UserCommGroup_Writer.start()
                 self.error_msg.setText('идёт получение...')
 
         except (ValueError, TypeError):
-            self.posts_info.setText('')
+            self.comm_info.setText('')
             self.error_msg.setText('неверный временной диапазон')
+
+    def update_label(self, text):
+        self.comm_info.setText(text)
+
+    def loading_finished(self):
+        self.error_msg.setText("готово")
 
     def go_back(self):
         self.close()
