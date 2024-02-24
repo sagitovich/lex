@@ -1,24 +1,26 @@
 import sys
-sys.path.insert(0, '/Users/a.sagitovich/programming/BFU/TES/vk_tes')
+sys.path.insert(0, '/Users/a.sagitovich/programming/BFU/lex/vk_lex')
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QThread
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
 
-from vk_tes.postsInfo import return_posts
-from vk_tes.getCommentsFromGroup import return_comments_group_filter
-from vk_tes.userMainDataVK import return_all_user_info, user_empty, take_user_data
-from vk_tes.userSubscriptionsVK import take_user_subscriptions_data, take_user_group_url_name
-from vk_tes.groupMainDataVK import return_all_group_main_data, group_empty, take_group_data, group_is_open
+from vk_lex.postsInfo import return_posts
+from vk_lex.getCommentsFromGroup import return_comments_group_filter
+from vk_lex.getCommentsFromUser import return_comments_user_filter
+from vk_lex.userMainDataVK import return_all_user_info, user_empty, take_user_data
+from vk_lex.userSubscriptionsVK import take_user_subscriptions_data, take_user_group_url_name
+from vk_lex.groupMainDataVK import return_all_group_main_data, group_empty, take_group_data, group_is_open
 
 
-class TES_Main(QMainWindow):
+# noinspection PyUnresolvedReferences
+class lex_Main(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi('main.ui', self)
-        self.setWindowTitle("TES")
+        self.setWindowTitle("lex")
 
-        self.vk_window = TES_vk_func(self)  # передайте self в качестве аргумента
+        self.vk_window = vk_func(self)  # передайте self в качестве аргумента
         self.to_vk_btn.clicked.connect(self.open_VK)
 
     def open_VK(self):
@@ -26,36 +28,37 @@ class TES_Main(QMainWindow):
         self.vk_window.show()
 
 
-class TES_vk_func(QWidget):
+# noinspection PyUnresolvedReferences
+class vk_func(QWidget):
     def __init__(self, main_window):
         super().__init__()
         uic.loadUi('vkFunctional.ui', self)
-        self.setWindowTitle('TES VK-ФУНКЦИИ')
+        self.setWindowTitle('lex VK-ФУНКЦИИ')
 
         self.main_window = main_window  # сохраните ссылку на главное окно
         self.from_vk_func_to_main_btn.clicked.connect(self.go_back)  # предполагается, что у вас есть кнопка "Назад"
 
-        self.vk_user_main_data = TES_UserMain(self)
+        self.vk_user_main_data = vk_UserMain(self)
         self.vk_user_main_data.windowClosed.connect(self.delete_user_main_window)
         self.userMainData_btn.clicked.connect(self.open_user_main_data)
 
-        self.vk_user_subscr_window = TES_Subscriptions(self)
+        self.vk_user_subscr_window = vk_UserSubscriptions(self)
         self.vk_user_subscr_window.windowClosed.connect(self.delete_subscr_window)
         self.userSubscr_btn.clicked.connect(self.open_user_subscr)
 
-        self.vk_user_posts = TES_UserPosts(self)
+        self.vk_user_posts = vk_UserPosts(self)
         self.vk_user_posts.windowClosed.connect(self.delete_user_posts)
         self.userPosts_btn.clicked.connect(self.open_user_posts)
 
-        self.vk_user_comm = TES_UserComments(self)
+        self.vk_user_comm = vk_UserComments(self)
         self.vk_user_comm.windowClosed.connect(self.delete_user_comm)
         self.userComm_btn.clicked.connect(self.open_user_comm)
 
-        self.vk_group_main_data = TES_GroupMain(self)
+        self.vk_group_main_data = vk_GroupMain(self)
         self.vk_group_main_data.windowClosed.connect(self.delete_group_main_window)
         self.gorupMainData_btn.clicked.connect(self.open_group_main_data)
 
-        self.vk_group_posts_data = TES_GroupPosts(self)
+        self.vk_group_posts_data = vk_GroupPosts(self)
         self.vk_group_posts_data.windowClosed.connect(self.delete_group_posts_window)
         self.groupPosts_btn.clicked.connect(self.open_group_posts_data)
 
@@ -67,7 +70,7 @@ class TES_vk_func(QWidget):
         self.hide()
         if self.vk_user_main_data is not None:
             self.vk_user_main_data.windowClosed.disconnect(self.delete_user_main_window)
-        self.vk_user_main_data = TES_UserMain(self)
+        self.vk_user_main_data = vk_UserMain(self)
         self.vk_user_main_data.windowClosed.connect(self.delete_user_main_window)
         self.vk_user_main_data.show()
 
@@ -78,7 +81,7 @@ class TES_vk_func(QWidget):
         self.hide()
         if self.vk_user_subscr_window is not None:
             self.vk_user_subscr_window.windowClosed.disconnect(self.delete_subscr_window)
-        self.vk_user_subscr_window = TES_Subscriptions(self)
+        self.vk_user_subscr_window = vk_UserSubscriptions(self)
         self.vk_user_subscr_window.windowClosed.connect(self.delete_subscr_window)
         self.vk_user_subscr_window.show()
 
@@ -89,7 +92,7 @@ class TES_vk_func(QWidget):
         self.hide()
         if self.vk_user_posts is not None:
             self.vk_user_posts.windowClosed.disconnect(self.delete_user_posts)
-        self.vk_user_posts = TES_UserPosts(self)
+        self.vk_user_posts = vk_UserPosts(self)
         self.vk_user_posts.windowClosed.connect(self.delete_user_posts)
         self.vk_user_posts.show()
 
@@ -100,7 +103,7 @@ class TES_vk_func(QWidget):
         self.hide()
         if self.vk_user_comm is not None:
             self.vk_user_comm.windowClosed.disconnect(self.delete_user_comm)
-        self.vk_user_comm = TES_UserComments(self)
+        self.vk_user_comm = vk_UserComments(self)
         self.vk_user_comm.windowClosed.connect(self.delete_user_comm)
         self.vk_user_comm.show()
 
@@ -111,7 +114,7 @@ class TES_vk_func(QWidget):
         self.hide()
         if self.vk_group_main_data is not None:
             self.vk_group_main_data.windowClosed.disconnect(self.delete_group_main_window)
-        self.vk_group_main_data = TES_GroupMain(self)
+        self.vk_group_main_data = vk_GroupMain(self)
         self.vk_group_main_data.windowClosed.connect(self.delete_group_main_window)
         self.vk_group_main_data.show()
 
@@ -122,7 +125,7 @@ class TES_vk_func(QWidget):
         self.hide()
         if self.vk_group_posts_data is not None:
             self.vk_group_posts_data.windowClosed.disconnect(self.delete_group_posts_window)
-        self.vk_group_posts_data = TES_GroupPosts(self)
+        self.vk_group_posts_data = vk_GroupPosts(self)
         self.vk_group_posts_data.windowClosed.connect(self.delete_group_posts_window)
         self.vk_group_posts_data.show()
 
@@ -130,13 +133,14 @@ class TES_vk_func(QWidget):
         self.vk_group_posts_data = None
 
 
-class TES_UserMain(QWidget):
+# noinspection PyUnresolvedReferences
+class vk_UserMain(QWidget):
     windowClosed = pyqtSignal()
 
     def __init__(self, parent_window):
         super().__init__()
         uic.loadUi('vkUserMain.ui', self)
-        self.setWindowTitle('TES VK-ПОЛЬЗОВАТЕЛИ-ОСНОВНОЕ')
+        self.setWindowTitle('lex VK-ПОЛЬЗОВАТЕЛИ-ОСНОВНОЕ')
 
         self.check_user.clicked.connect(self.click)
 
@@ -164,13 +168,14 @@ class TES_UserMain(QWidget):
         self.windowClosed.emit()
 
 
-class TES_Subscriptions(QWidget):
+# noinspection PyUnresolvedReferences
+class vk_UserSubscriptions(QWidget):
     windowClosed = pyqtSignal()
 
     def __init__(self, parent_window):
         super().__init__()
         uic.loadUi('vkUserSubscr.ui', self)
-        self.setWindowTitle('TES VK-ПОЛЬЗОВАТЕЛИ-ПОДПИСКИ')
+        self.setWindowTitle('lex VK-ПОЛЬЗОВАТЕЛИ-ПОДПИСКИ')
 
         self.check_user.clicked.connect(self.click)
 
@@ -198,7 +203,8 @@ class TES_Subscriptions(QWidget):
         self.windowClosed.emit()
 
 
-class VK_Posts_Writer(QThread):
+# noinspection PyUnresolvedReferences
+class vk_Posts_Writer(QThread):
     data_ready = pyqtSignal(str)
     loading_finished = pyqtSignal()
 
@@ -218,14 +224,15 @@ class VK_Posts_Writer(QThread):
         self.loading_finished.emit()
 
 
-class TES_UserPosts(QWidget):
+# noinspection PyUnresolvedReferences
+class vk_UserPosts(QWidget):
     windowClosed = pyqtSignal()
 
     def __init__(self, parent_window):
         super().__init__()
         self.VK_Posts_Writer = (self, self)
         uic.loadUi('vkUserPosts.ui', self)
-        self.setWindowTitle('TES VK-ПОЛЬЗОВАТЕЛИ-ЗАПИСИ')
+        self.setWindowTitle('lex VK-ПОЛЬЗОВАТЕЛИ-ЗАПИСИ')
 
         self.parent_window = parent_window
         self.from_user_posts_to_vk_func_btn.clicked.connect(self.go_back)
@@ -248,7 +255,7 @@ class TES_UserPosts(QWidget):
                 self.error_msg.setText('выберете меньший диапазон времени')
             else:
                 self.error_msg.setText('')
-                self.VK_Posts_Writer = VK_Posts_Writer(name, days)
+                self.VK_Posts_Writer = vk_Posts_Writer(name, days)
                 self.VK_Posts_Writer.data_ready.connect(self.update_label)
                 self.VK_Posts_Writer.loading_finished.connect(self.loading_finished)
                 self.VK_Posts_Writer.start()
@@ -270,7 +277,8 @@ class TES_UserPosts(QWidget):
         self.windowClosed.emit()
 
 
-class VK_UserCommGroup_Writer(QThread):
+# noinspection PyUnresolvedReferences
+class vk_UserCommGroup_Writer(QThread):
     data_ready = pyqtSignal(str)
     loading_finished = pyqtSignal()
 
@@ -291,22 +299,68 @@ class VK_UserCommGroup_Writer(QThread):
         self.loading_finished.emit()
 
 
-class TES_UserComments(QWidget):
+# noinspection PyUnresolvedReferences
+class vk_UserCommUser_Writer(QThread):
+    data_ready = pyqtSignal(str)
+    loading_finished = pyqtSignal()
+
+    def __init__(self, user_domain, user_check, days):
+        super().__init__()
+        self.user_domain = user_domain
+        self.user_check = user_check
+        self.days = days
+
+    def run(self):
+        result = return_comments_user_filter(self.user_domain, self.user_check, self.days)
+        text = ''
+        for line in result:
+            for i in line:
+                text += (i + '\n')
+            text += (96 * '-' + '\n')
+            self.data_ready.emit(text)
+        self.loading_finished.emit()
+
+
+# noinspection PyUnresolvedReferences
+class vk_UserComments(QWidget):
     windowClosed = pyqtSignal()
 
     def __init__(self, parent_window):
         super().__init__()
         uic.loadUi('vkUserCommOptions.ui', self)
-        self.setWindowTitle('TES VK-ПОЛЬЗОВАТЕЛИ-КОММЕНТАРИИ')
+        self.setWindowTitle('lex VK-ПОЛЬЗОВАТЕЛИ-КОММЕНТАРИИ')
 
         self.parent_window = parent_window
         self.back_btn.clicked.connect(self.go_back)
 
         self.user_domain = self.input_url.text()    # запомним того, кого проверяем
 
-        self.vk_user_comm_group = TES_UserCommGroup(self)
+        self.vk_user_comm_user = vk_UserCommUser(self)
+        self.vk_user_comm_user.windowClosed.connect(self.delete_user_comm_user)
+        self.one_user_btn.clicked.connect(self.open_user_comm_user)
+
+        self.vk_user_comm_group = vk_UserCommGroup(self)
         self.vk_user_comm_group.windowClosed.connect(self.delete_user_comm_group)
         self.one_group_btn.clicked.connect(self.open_user_comm_group)
+
+    def open_user_comm_user(self):
+        self.user_domain = self.input_url.text()  # запомним того, кого проверяем
+        if not self.user_domain:
+            text = 'нет ссылки на проверяемого'
+            self.error_msg.setText(text)
+        elif user_empty(take_user_data(self.user_domain)) is False:
+            text = 'пользователя не существует'
+            self.error_msg.setText(text)
+        else:
+            self.hide()
+            if self.vk_user_comm_user is not None:
+                self.vk_user_comm_user.windowClosed.disconnect(self.delete_user_comm_user)
+            self.vk_user_comm_user = vk_UserCommUser(self)
+            self.vk_user_comm_user.windowClosed.connect(self.delete_user_comm_user)
+            self.vk_user_comm_user.show()
+
+    def delete_user_comm_user(self):
+        self.vk_user_comm_user = None
 
     def open_user_comm_group(self):
         self.user_domain = self.input_url.text()  # запомним того, кого проверяем
@@ -320,7 +374,7 @@ class TES_UserComments(QWidget):
             self.hide()
             if self.vk_user_comm_group is not None:
                 self.vk_user_comm_group.windowClosed.disconnect(self.delete_user_comm_group)
-            self.vk_user_comm_group = TES_UserCommGroup(self)
+            self.vk_user_comm_group = vk_UserCommGroup(self)
             self.vk_user_comm_group.windowClosed.connect(self.delete_user_comm_group)
             self.vk_user_comm_group.show()
 
@@ -333,14 +387,75 @@ class TES_UserComments(QWidget):
         self.windowClosed.emit()
 
 
-class TES_UserCommGroup(QWidget):
+# noinspection PyUnresolvedReferences
+class vk_UserCommUser(QWidget):
+    windowClosed = pyqtSignal()
+
+    def __init__(self, parent_window):
+        super().__init__()
+        self.VK_UserCommUser_Writer = (self, self, self)
+        uic.loadUi('vkUserCommUser.ui', self)
+        self.setWindowTitle('lex VK-ПОЛЬЗОВАТЕЛИ-КОММЕНТАРИИ')
+
+        self.parent_window = parent_window
+        self.back_btn.clicked.connect(self.go_back)
+
+        self.user_who_check.setText(self.parent_window.user_domain)
+        self.check_comm.clicked.connect(self.click)
+
+    def click(self):
+        user = self.input_url.text()  # Получим текст из поля ввода
+        user_check = self.user_who_check.toPlainText()
+        days = self.day_input.text()  # Получим количество дней
+        self.error_msg.setText('')
+        self.comm_info.setText('')
+        try:
+            days = int(days)
+            if not user:
+                self.comm_info.setText('')
+                self.error_msg.setText('не введён домен или url страницы')
+            elif user_empty(take_user_data(user)) is False:
+                self.comm_info.setText('')
+                self.error_msg.setText('пользователя не существует')
+            # elif group_is_open(take_group_data(group)) is False:
+            #     self.comm_info.setText('')
+                self.error_msg.setText('страница закрыта')
+            elif days > 1100:
+                self.comm_info.setText('')
+                self.error_msg.setText('выберете меньший диапазон времени')
+            else:
+                self.error_msg.setText('')
+                self.VK_UserCommUser_Writer = vk_UserCommUser_Writer(user, user_check, days)
+                self.VK_UserCommUser_Writer.data_ready.connect(self.update_label)
+                self.VK_UserCommUser_Writer.loading_finished.connect(self.loading_finished)
+                self.VK_UserCommUser_Writer.start()
+                self.error_msg.setText('идёт получение...')
+
+        except (ValueError, TypeError):
+            self.comm_info.setText('')
+            self.error_msg.setText('неверный временной диапазон')
+
+    def update_label(self, text):
+        self.comm_info.setText(text)
+
+    def loading_finished(self):
+        self.error_msg.setText("готово")
+
+    def go_back(self):
+        self.close()
+        self.parent_window.show()
+        self.windowClosed.emit()
+
+
+# noinspection PyUnresolvedReferences
+class vk_UserCommGroup(QWidget):
     windowClosed = pyqtSignal()
 
     def __init__(self, parent_window):
         super().__init__()
         self.VK_UserCommGroup_Writer = (self, self, self)
         uic.loadUi('vkUserCommGroup.ui', self)
-        self.setWindowTitle('TES VK-ПОЛЬЗОВАТЕЛИ-КОММЕНТАРИИ')
+        self.setWindowTitle('lex VK-ПОЛЬЗОВАТЕЛИ-КОММЕНТАРИИ')
 
         self.parent_window = parent_window
         self.back_btn.clicked.connect(self.go_back)
@@ -370,7 +485,7 @@ class TES_UserCommGroup(QWidget):
                 self.error_msg.setText('выберете меньший диапазон времени')
             else:
                 self.error_msg.setText('')
-                self.VK_UserCommGroup_Writer = VK_UserCommGroup_Writer(group, user_check, days)
+                self.VK_UserCommGroup_Writer = vk_UserCommGroup_Writer(group, user_check, days)
                 self.VK_UserCommGroup_Writer.data_ready.connect(self.update_label)
                 self.VK_UserCommGroup_Writer.loading_finished.connect(self.loading_finished)
                 self.VK_UserCommGroup_Writer.start()
@@ -392,13 +507,14 @@ class TES_UserCommGroup(QWidget):
         self.windowClosed.emit()
 
 
-class TES_GroupMain(QWidget):
+# noinspection PyUnresolvedReferences
+class vk_GroupMain(QWidget):
     windowClosed = pyqtSignal()
 
     def __init__(self, parent_window):
         super().__init__()
         uic.loadUi('vkGroupMain.ui', self)
-        self.setWindowTitle('TES VK-СООБЩЕСТВО')
+        self.setWindowTitle('lex VK-СООБЩЕСТВО')
 
         self.check_group.clicked.connect(self.click)
 
@@ -426,14 +542,15 @@ class TES_GroupMain(QWidget):
         self.windowClosed.emit()
 
 
-class TES_GroupPosts(QWidget):
+# noinspection PyUnresolvedReferences
+class vk_GroupPosts(QWidget):
     windowClosed = pyqtSignal()
 
     def __init__(self, parent_window):
         super().__init__()
         self.worker = (self, self)
         uic.loadUi('vkGroupPosts.ui', self)
-        self.setWindowTitle('TES VK-СООБЩЕСТВО-ЗАПИСИ')
+        self.setWindowTitle('lex VK-СООБЩЕСТВО-ЗАПИСИ')
 
         self.parent_window = parent_window
         self.from_group_posts_to_vk_func_btn.clicked.connect(self.go_back)
@@ -456,7 +573,7 @@ class TES_GroupPosts(QWidget):
                 self.error_msg.setText('выберете меньший диапазон времени')
             else:
                 self.error_msg.setText('')
-                self.worker = VK_Posts_Writer(name, days)
+                self.worker = vk_Posts_Writer(name, days)
                 self.worker.data_ready.connect(self.update_label)
                 self.worker.loading_finished.connect(self.loading_finished)
                 self.worker.start()
@@ -479,6 +596,6 @@ class TES_GroupPosts(QWidget):
 
 
 app = QApplication([])
-run = TES_Main()
+run = lex_Main()
 run.show()
 app.exec_()

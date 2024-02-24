@@ -40,21 +40,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="0">
-      <widget class="QPushButton" name="userSubscr_btn">
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>19</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Подписки</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QPushButton" name="userMainData_btn">
        <property name="font">
@@ -73,8 +58,8 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QPushButton" name="userComm_btn">
+     <item row="1" column="0">
+      <widget class="QPushButton" name="userFriends_btn">
        <property name="font">
         <font>
          <family>Times New Roman</family>
@@ -84,11 +69,26 @@
         </font>
        </property>
        <property name="text">
-        <string>Комментарии</string>
+        <string>Друзья</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
+      <widget class="QPushButton" name="userSubscr_btn">
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>19</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Подписки</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
       <widget class="QPushButton" name="userPosts_btn">
        <property name="font">
         <font>
@@ -100,6 +100,21 @@
        </property>
        <property name="text">
         <string>Записи</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0" colspan="2">
+      <widget class="QPushButton" name="userComm_btn">
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>19</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Комментарии</string>
        </property>
       </widget>
      </item>
