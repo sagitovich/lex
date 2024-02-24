@@ -82,6 +82,9 @@
    <property name="text">
     <string>Назад</string>
    </property>
+   <property name="shortcut">
+    <string>Esc, Left</string>
+   </property>
   </widget>
   <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">

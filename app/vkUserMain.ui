@@ -134,6 +134,9 @@
    <property name="text">
     <string>Назад</string>
    </property>
+   <property name="shortcut">
+    <string>Esc, Left</string>
+   </property>
   </widget>
   <widget class="QTextEdit" name="main_info">
    <property name="geometry">

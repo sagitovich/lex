@@ -177,7 +177,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Сообщество для проверки:</string>
+    <string>Страница для проверки:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="day_input">
@@ -193,9 +193,9 @@
   <widget class="QLineEdit" name="input_url">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>200</x>
      <y>10</y>
-     <width>281</width>
+     <width>301</width>
      <height>31</height>
     </rect>
    </property>

@@ -110,6 +110,9 @@
    <property name="text">
     <string>Назад</string>
    </property>
+   <property name="shortcut">
+    <string>Esc, Left</string>
+   </property>
   </widget>
   <widget class="QLabel" name="cnt_of_posts_check">
    <property name="geometry">
