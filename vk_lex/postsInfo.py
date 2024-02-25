@@ -35,23 +35,23 @@ def take_page_data(domain, days_):
                 yield post  # возвращаем пост как только он удовлетворяет условию
             else:
                 flag_end = True
-        if flag_end:    # если ничего не добавилось в all_posts -> следующие посты слишком старые
+        if flag_end:  # если ничего не добавилось в all_posts -> следующие посты слишком старые
             break
-        time.sleep(0.5)
+        time.sleep(0.1)
 
 
 def take_id_of_all_posts(data):
     all_id = []
-    for i in data:
-        all_id.append(i['id'])
+    for item in data:
+        all_id.append(item['id'])
     return all_id
 
 
 def take_count_of_comments_of_all_posts(data):
     all_comm = []
     try:
-        for i in data:
-            all_comm.append(i['comments']['count'])
+        for item in data:
+            all_comm.append(item['comments']['count'])
         return all_comm
     except KeyError:
         return 'комментарии скрыты'
@@ -72,12 +72,12 @@ def return_posts(domain, days_):
                 else:
                     text = post['text']
 
-                if post['owner_id'] > 0:    # если страница пользователя
+                if post['owner_id'] > 0:  # если страница пользователя
                     try:
                         author = f"https://vk.com/{str(take_user_domain(take_user_data(domain)))}"
                     except (KeyError, IndexError, TypeError):
                         author = f"https://vk.com/id{str(post['from_id'])}"
-                else:   # если страница сообщества
+                else:  # если страница сообщества
                     try:
                         author = f"{make_url_to_group((take_group_data(domain)))}"
                     except (KeyError, IndexError, TypeError):
