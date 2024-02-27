@@ -34,7 +34,7 @@
     <string>Назад</string>
    </property>
    <property name="shortcut">
-    <string>Esc, Left</string>
+    <string>Esc</string>
    </property>
   </widget>
   <widget class="QLabel" name="subscrTitle">

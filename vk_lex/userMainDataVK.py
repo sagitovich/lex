@@ -19,7 +19,7 @@ def take_user_data(domain):
                            'v': version
                        }
                        )
-    time.sleep(0.5)
+    time.sleep(0.1)
     data = src.json()
     return data
 
@@ -128,3 +128,7 @@ def return_all_user_info(domain):
     phone = f'Телефон: {take_user_mobile(data)}'
     site = f'Сайт: {take_user_web_site(data)}'
     return [url, name, bdate, city, phone, site]
+
+
+# temp = take_user_data('https://vk.com/id98768')
+# print()

@@ -39,12 +39,3 @@ def take_friends_info(domain):
         except KeyError:
             city = f'Город: нет данных'
         yield [url, name, bdate, city]
-
-
-test = take_friends_info('mureliz')
-for i in test:
-    for item in i:
-        print(item)
-    print()
-
-

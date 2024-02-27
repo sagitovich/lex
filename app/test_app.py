@@ -6,11 +6,13 @@ from PyQt5.QtCore import pyqtSignal, QThread
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
 
 from vk_lex.postsInfo import return_posts
+from vk_lex.getUserFriends import take_friends_info
 from vk_lex.getCommentsFromGroup import return_comments_group_filter
 from vk_lex.getCommentsFromUser import return_comments_user_filter
 from vk_lex.userMainDataVK import return_all_user_info, user_empty, take_user_data
 from vk_lex.userSubscriptionsVK import take_user_subscriptions_data, take_user_group_url_name
 from vk_lex.groupMainDataVK import return_all_group_main_data, group_empty, take_group_data, group_is_open
+from vk_lex.getGroupFollowers import take_group_followers_url_name
 
 
 # noinspection PyUnresolvedReferences
@@ -42,6 +44,10 @@ class vk_func(QWidget):
         self.vk_user_main_data.windowClosed.connect(self.delete_user_main_window)
         self.userMainData_btn.clicked.connect(self.open_user_main_data)
 
+        self.vk_user_friends = vk_UserFriends(self)
+        self.vk_user_friends.windowClosed.connect(self.delete_user_friends)
+        self.userFriends_btn.clicked.connect(self.open_user_friends)
+
         self.vk_user_subscr_window = vk_UserSubscriptions(self)
         self.vk_user_subscr_window.windowClosed.connect(self.delete_subscr_window)
         self.userSubscr_btn.clicked.connect(self.open_user_subscr)
@@ -57,6 +63,10 @@ class vk_func(QWidget):
         self.vk_group_main_data = vk_GroupMain(self)
         self.vk_group_main_data.windowClosed.connect(self.delete_group_main_window)
         self.gorupMainData_btn.clicked.connect(self.open_group_main_data)
+
+        self.vk_group_followers = vk_GroupFollowers(self)
+        self.vk_group_followers.windowClosed.connect(self.delete_group_followers)
+        self.groupFollowers_btn.clicked.connect(self.open_group_followers)
 
         self.vk_group_posts_data = vk_GroupPosts(self)
         self.vk_group_posts_data.windowClosed.connect(self.delete_group_posts_window)
@@ -76,6 +86,17 @@ class vk_func(QWidget):
 
     def delete_user_main_window(self):
         self.vk_user_main_data = None
+
+    def open_user_friends(self):
+        self.hide()
+        if self.vk_user_friends is not None:
+            self.vk_user_friends.windowClosed.disconnect(self.delete_user_friends)
+        self.vk_user_friends = vk_UserFriends(self)
+        self.vk_user_friends.windowClosed.connect(self.delete_user_friends)
+        self.vk_user_friends.show()
+
+    def delete_user_friends(self):
+        self.vk_user_friends = None
 
     def open_user_subscr(self):
         self.hide()
@@ -121,6 +142,17 @@ class vk_func(QWidget):
     def delete_group_main_window(self):
         self.vk_group_main_data = None
 
+    def open_group_followers(self):
+        self.hide()
+        if self.vk_group_followers is not None:
+            self.vk_group_followers.windowClosed.disconnect(self.delete_group_followers)
+        self.vk_group_followers = vk_GroupFollowers(self)
+        self.vk_group_followers.windowClosed.connect(self.delete_group_followers)
+        self.vk_group_followers.show()
+
+    def delete_group_followers(self):
+        self.vk_group_followers = None
+
     def open_group_posts_data(self):
         self.hide()
         if self.vk_group_posts_data is not None:
@@ -159,6 +191,43 @@ class vk_UserMain(QWidget):
 
         except (KeyError, IndexError, TypeError):
             self.main_info.setText('')  # очищаем scrollArea
+            text = 'страница не найдена или закрыта'
+            self.error_msg.setText(text)
+
+    def go_back(self):
+        self.close()
+        self.parent_window.show()
+        self.windowClosed.emit()
+
+
+# noinspection PyUnresolvedReferences
+class vk_UserFriends(QWidget):
+    windowClosed = pyqtSignal()
+
+    def __init__(self, parent_window):
+        super().__init__()
+        uic.loadUi('vkUserFriends.ui', self)
+        self.setWindowTitle('lex VK-ПОЛЬЗОВАТЕЛИ-ДРУЗЬЯ')
+
+        self.check_user.clicked.connect(self.click)
+
+        self.parent_window = parent_window
+        self.back_btn.clicked.connect(self.go_back)
+
+    def click(self):
+        name = self.input_url.text()  # Получим текст из поля ввода
+        try:
+            result = take_friends_info(name)
+            text = ''
+            for line in result:
+                for i in line:
+                    text += (i + '\n')
+                text += (96 * '-' + '\n')
+            self.error_msg.setText('')
+            self.friends_info.setText(text)  # Устанавливаем текст для QLabel, а не для QScrollArea
+
+        except (KeyError, IndexError, TypeError):
+            self.friends_info.setText('')  # очищаем scrollArea
             text = 'страница не найдена или закрыта'
             self.error_msg.setText(text)
 
@@ -543,12 +612,75 @@ class vk_GroupMain(QWidget):
 
 
 # noinspection PyUnresolvedReferences
+class vk_GroupFollowers_Writer(QThread):
+    data_ready = pyqtSignal(str)
+    loading_finished = pyqtSignal()
+
+    def __init__(self, domain):
+        super().__init__()
+        self.domain = domain
+
+    def run(self):
+        result = take_group_followers_url_name(self.domain)
+        text = ''
+        for line in result:
+            text += (line + '\n' + (96 * '-') + '\n')
+            self.data_ready.emit(text)
+        self.loading_finished.emit()
+
+
+# noinspection PyUnresolvedReferences
+class vk_GroupFollowers(QWidget):
+    windowClosed = pyqtSignal()
+
+    def __init__(self, parent_window):
+        super().__init__()
+        uic.loadUi('vkGroupFollowers.ui', self)
+        self.vk_GroupFollowers_Writer = self
+        self.setWindowTitle('lex VK-СООБЩЕСТВО-ПОДПИСЧИКИ')
+
+        self.check_user.clicked.connect(self.click)
+
+        self.parent_window = parent_window
+        self.back_btn.clicked.connect(self.go_back)
+
+    def click(self):
+        name = self.input_url.text()  # Получим текст из поля ввода
+        if not group_empty(take_group_data(name)):
+            self.followers_info.setText('')
+            text = 'сообщества не существует'
+            self.error_msg.setText(text)
+        elif group_is_open(take_group_data(name)) is False:
+            self.followers_info.setText('')
+            text = 'невозможно узнать подписчиков'
+            self.error_msg.setText(text)
+        else:
+            self.error_msg.setText('')
+            self.vk_GroupFollowers_Writer = vk_GroupFollowers_Writer(name)
+            self.vk_GroupFollowers_Writer.data_ready.connect(self.update_label)
+            self.vk_GroupFollowers_Writer.loading_finished.connect(self.loading_finished)
+            self.vk_GroupFollowers_Writer.start()
+            self.error_msg.setText('идёт получение...')
+
+    def update_label(self, text):
+        self.followers_info.setText(text)
+
+    def loading_finished(self):
+        self.error_msg.setText("готово")
+
+    def go_back(self):
+        self.close()
+        self.parent_window.show()
+        self.windowClosed.emit()
+
+
+# noinspection PyUnresolvedReferences
 class vk_GroupPosts(QWidget):
     windowClosed = pyqtSignal()
 
     def __init__(self, parent_window):
         super().__init__()
-        self.worker = (self, self)
+        self.vk_Post_Writer = (self, self)
         uic.loadUi('vkGroupPosts.ui', self)
         self.setWindowTitle('lex VK-СООБЩЕСТВО-ЗАПИСИ')
 
@@ -573,10 +705,10 @@ class vk_GroupPosts(QWidget):
                 self.error_msg.setText('выберете меньший диапазон времени')
             else:
                 self.error_msg.setText('')
-                self.worker = vk_Posts_Writer(name, days)
-                self.worker.data_ready.connect(self.update_label)
-                self.worker.loading_finished.connect(self.loading_finished)
-                self.worker.start()
+                self.vk_Post_Writer = vk_Posts_Writer(name, days)
+                self.vk_Post_Writer.data_ready.connect(self.update_label)
+                self.vk_Post_Writer.loading_finished.connect(self.loading_finished)
+                self.vk_Post_Writer.start()
                 self.error_msg.setText('идёт получение...')
 
         except (ValueError, TypeError):
