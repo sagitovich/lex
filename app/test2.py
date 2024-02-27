@@ -3,9 +3,10 @@ import sys
 sys.path.insert(0, '/Users/a.sagitovich/programming/BFU/lex/vk_lex')
 
 from PyQt5 import uic, QtWidgets
-from PyQt5.QtCore import pyqtSignal, QThread
+from PyQt5.QtCore import pyqtSignal, QThread, QDate
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget
 
+from vk_lex.postsInfo import return_posts
 from vk_lex.getUserFriends import take_friends_info
 from vk_lex.userMainDataVK import return_all_user_info
 from vk_lex.getGroupFollowers import take_group_followers_url_name
@@ -22,11 +23,12 @@ class vk_Functional(QMainWindow):
 
         # Предполагая, что info является QStackedWidget
         self.info = self.findChild(QStackedWidget, 'stackedWidget')
-        self.layout = QtWidgets.QVBoxLayout(self.info)  #
+        self.layout = QtWidgets.QVBoxLayout(self.info)
 
         self.mainUser_btn.clicked.connect(self.mainUser_open)
         self.friendUser_btn.clicked.connect(self.friendUser_open)
         self.subscrUser_btn.clicked.connect(self.subscrUser_open)
+        self.postsUser_btn.clicked.connect(self.postsUser_open)
 
         self.mainGroup_btn.clicked.connect(self.mainGroup_open)
         self.followersGroup_btn.clicked.connect(self.followersGroup_open)
@@ -45,6 +47,11 @@ class vk_Functional(QMainWindow):
         user_subscr = vk_UserSubscriptions(self)
         self.info.addWidget(user_subscr)
         self.info.setCurrentWidget(user_subscr)
+
+    def postsUser_open(self):
+        user_posts = vk_UserPosts(self)
+        self.info.addWidget(user_posts)
+        self.info.setCurrentWidget(user_posts)
 
     def mainGroup_open(self):
         group_main = vk_GroupMain(self)
@@ -171,6 +178,106 @@ class vk_UserSubscriptions(QWidget):
         else:
             self.subscr_info.setText('')
             self.error_msg.setText('')
+
+    def go_back(self):
+        self.close()
+        self.parent_window.show()
+        self.windowClosed.emit()
+
+
+# noinspection PyUnresolvedReferences
+class vk_Posts_Writer(QThread):
+    data_ready = pyqtSignal(str)
+    loading_finished = pyqtSignal()
+
+    def __init__(self, domain, days):
+        super().__init__()
+        self.domain = domain
+        self.days = days
+        self.is_paused = False
+
+    def run(self):
+        result = return_posts(self.domain, self.days)
+        text = ''
+        for line in result:
+            for i in line:
+                text += (i + '\n')
+            text += (68 * '-' + '\n')
+            self.data_ready.emit(text)
+            if self.is_paused:
+                return
+        self.loading_finished.emit()
+
+    def pause(self):
+        self.is_paused = True
+
+    def resume(self):
+        self.is_paused = False
+        self.start()
+
+
+# noinspection PyUnresolvedReferences
+class vk_UserPosts(QWidget):
+    windowClosed = pyqtSignal()
+
+    def __init__(self, parent_window):
+        super().__init__()
+        self.VK_Posts_Writer = (self, self)
+        uic.loadUi('vkUserPosts.ui', self)
+        self.setWindowTitle('lex VK-ПОЛЬЗОВАТЕЛИ-ЗАПИСИ')
+
+        self.old_date.setDate(QDate.currentDate().addMonths(-1))
+        self.cur_date.setDate(QDate.currentDate())
+
+        self.update_info.clicked.connect(self.click)
+        self.pause_btn.clicked.connect(self.pause_or_resume)
+
+        self.parent_window = parent_window
+        self.back_btn.clicked.connect(self.go_back)
+
+        self.click()
+
+    def click(self):
+        name = self.parent_window.input_url_group.text()
+        days = 1
+        if name != '':
+            self.error_msg.setText('')
+            self.posts_info.setText('')
+            try:
+                days = int(days)
+                if (not name) or (user_empty(take_user_data(name)) is False):
+                    self.posts_info.setText('')
+                    self.error_msg.setText('неверный домен или url страницы')
+                elif days > 1100:
+                    self.posts_info.setText('')
+                    self.error_msg.setText('выберете меньший диапазон времени')
+                else:
+                    self.error_msg.setText('')
+                    self.VK_Posts_Writer = vk_Posts_Writer(name, days)
+                    self.VK_Posts_Writer.data_ready.connect(self.update_label)
+                    self.VK_Posts_Writer.loading_finished.connect(self.loading_finished)
+                    self.VK_Posts_Writer.start()
+                    self.error_msg.setText('идёт получение...')
+            except (ValueError, TypeError):
+                self.posts_info.setText('')
+                self.error_msg.setText('неверный временной диапазон')
+        else:
+            self.posts_info.setText('')
+            self.error_msg.setText('')
+
+    def update_label(self, text):
+        self.posts_info.setText(text)
+
+    def loading_finished(self):
+        self.error_msg.setText("готово")
+
+    def pause_or_resume(self):
+        if self.vk_Posts_Writer.is_paused:
+            self.vk_Posts_Writer.resume()
+            self.pause_btn.setText("Пауза")
+        else:
+            self.vk_Posts_Writer.pause()
+            self.pause_btn.setText("Пуск")
 
     def go_back(self):
         self.close()
@@ -319,4 +426,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

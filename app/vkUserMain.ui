@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>616</width>
-    <height>516</height>
+    <width>644</width>
+    <height>599</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -81,30 +81,6 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QPushButton" name="back_btn">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>15</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Скрыть</string>
-         </property>
-         <property name="shortcut">
-          <string>Esc</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -118,7 +94,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="update_info">
+        <widget class="QPushButton" name="back_btn">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -128,16 +104,40 @@
          <property name="font">
           <font>
            <family>Arial</family>
-           <pointsize>15</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
+           <pointsize>13</pointsize>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Скрыть</string>
+         </property>
+         <property name="shortcut">
+          <string>Esc</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="update_info">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <family>Apple Symbols</family>
+           <pointsize>13</pointsize>
+           <weight>50</weight>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
           <string>Обновить</string>
          </property>
          <property name="shortcut">
-          <string>Esc</string>
+          <string>Return</string>
          </property>
         </widget>
        </item>
