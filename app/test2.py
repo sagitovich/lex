@@ -1,7 +1,8 @@
+import os
 import sys
 sys.path.insert(0, '/Users/a.sagitovich/programming/BFU/lex/vk_lex')
 
-from PyQt5 import uic
+from PyQt5 import uic, QtWidgets
 from PyQt5.QtCore import pyqtSignal, QThread
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget
 
@@ -16,11 +17,12 @@ from vk_lex.groupMainDataVK import return_all_group_main_data, group_empty, take
 class vk_Functional(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('vkFunctional.ui', self)
+        uic.loadUi('vkFunctional_.ui', self)
         self.setWindowTitle('lex VK-ФУНКЦИИ')
 
         # Предполагая, что info является QStackedWidget
         self.info = self.findChild(QStackedWidget, 'stackedWidget')
+        self.layout = QtWidgets.QVBoxLayout(self.info)  #
 
         self.mainUser_btn.clicked.connect(self.mainUser_open)
         self.friendUser_btn.clicked.connect(self.friendUser_open)
@@ -225,6 +227,7 @@ class vk_GroupFollowers_Writer(QThread):
     def __init__(self, domain):
         super().__init__()
         self.domain = domain
+        self.is_paused = False
 
     def run(self):
         result = take_group_followers_url_name(self.domain)
@@ -234,7 +237,16 @@ class vk_GroupFollowers_Writer(QThread):
                 text += (i + '\n')
             text += (68 * '-' + '\n')
             self.data_ready.emit(text)
+            if self.is_paused:
+                return
         self.loading_finished.emit()
+
+    def pause(self):
+        self.is_paused = True
+
+    def resume(self):
+        self.is_paused = False
+        self.start()
 
 
 # noinspection PyUnresolvedReferences
@@ -248,6 +260,7 @@ class vk_GroupFollowers(QWidget):
         self.setWindowTitle('lex VK-СООБЩЕСТВО-ПОДПИСЧИКИ')
 
         self.update_info.clicked.connect(self.click)
+        self.pause_btn.clicked.connect(self.pause_or_resume)
 
         self.parent_window = parent_window
         self.back_btn.clicked.connect(self.go_back)
@@ -282,13 +295,28 @@ class vk_GroupFollowers(QWidget):
     def loading_finished(self):
         self.error_msg.setText("готово")
 
+    def pause_or_resume(self):
+        if self.vk_GroupFollowers_Writer.is_paused:
+            self.vk_GroupFollowers_Writer.resume()
+            self.pause_btn.setText("Пауза")
+        else:
+            self.vk_GroupFollowers_Writer.pause()
+            self.pause_btn.setText("Пуск")
+
     def go_back(self):
         self.close()
         self.parent_window.show()
         self.windowClosed.emit()
 
 
-app = QApplication([])
-run = vk_Functional()
-run.show()
-app.exec_()
+def main():
+    os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+    app = QApplication([])
+    run = vk_Functional()
+    run.show()
+    app.exec_()
+
+
+if __name__ == "__main__":
+    main()
+
