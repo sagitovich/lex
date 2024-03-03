@@ -5,7 +5,7 @@ from userMainDataVK import take_user_domain, take_user_data
 from groupMainDataVK import make_url_to_group, take_group_data
 
 
-def take_page_data(domain, days_):
+def take_page_data(domain, start_date, end_date):
     if domain.startswith('https://vk.com/'):
         domain = domain.split('/')[-1]
 
@@ -13,6 +13,9 @@ def take_page_data(domain, days_):
     version = 5.92
     count = 50
     offset = 0
+
+    start_date_ = datetime.datetime.fromtimestamp(start_date).date()
+    end_date_ = datetime.datetime.fromtimestamp(end_date).date()
 
     while offset < 100_000_000:
         response = requests.get('https://api.vk.com/method/wall.get',
@@ -31,10 +34,13 @@ def take_page_data(domain, days_):
         flag_end = False
         for post in data:
             post_date = datetime.datetime.fromtimestamp(post['date']).date()
-            if (datetime.datetime.now().date() - post_date).days <= days_:
+            if start_date_ <= post_date <= end_date_:
                 yield post  # возвращаем пост как только он удовлетворяет условию
             else:
-                flag_end = True
+                if (start_date_ <= post_date) and (post_date >= end_date_):
+                    pass
+                elif (start_date_ >= post_date) and (post_date <= end_date_):
+                    flag_end = True
         if flag_end:  # если ничего не добавилось в all_posts -> следующие посты слишком старые
             break
         time.sleep(0.1)
@@ -57,9 +63,9 @@ def take_count_of_comments_of_all_posts(data):
         return 'комментарии скрыты'
 
 
-def return_posts(domain, days_):
+def return_posts(domain, start_date, end_date):
     try:
-        data = take_page_data(domain, days_)
+        data = take_page_data(domain, start_date, end_date)
         try:
             for post in data:
                 date = datetime.datetime.fromtimestamp(post['date']).strftime('%d.%m.%Y %H:%M:%S')
@@ -91,3 +97,9 @@ def return_posts(domain, days_):
             return False
     except (KeyError, IndexError):
         return False
+
+#
+# temp = return_posts('v_d_n_h', 1619733600, 1621634400)
+# for i in temp:
+#     for j in i:
+#         print(j)
