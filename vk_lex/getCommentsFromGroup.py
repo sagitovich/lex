@@ -74,9 +74,9 @@ def take_comments_g(group, post_id, value_):
         pass
 
 
-def return_comments_group_no_filter(group, days_):
-    ids = take_id_of_all_posts(take_page_data(group, days_))
-    cnt = take_count_of_comments_of_all_posts(take_page_data(group, days_))
+def return_comments_group_no_filter(group, start_date_, end_date_):
+    ids = take_id_of_all_posts(take_page_data(group, start_date_, end_date_))
+    cnt = take_count_of_comments_of_all_posts(take_page_data(group, start_date_, end_date_))
 
     aboba = 1
     for i, j in zip(ids, cnt):
@@ -107,9 +107,9 @@ def return_comments_group_no_filter(group, days_):
         aboba += 1
 
 
-def return_comments_group_filter(group, users, days_):
-    ids = take_id_of_all_posts(take_page_data(group, days_))
-    cnt = take_count_of_comments_of_all_posts(take_page_data(group, days_))
+def return_comments_group_filter(group, users, start_date_, end_date_):
+    ids = take_id_of_all_posts(take_page_data(group, start_date_, end_date_))
+    cnt = take_count_of_comments_of_all_posts(take_page_data(group, start_date_, end_date_))
 
     aboba = 1
     for i, j in zip(ids, cnt):

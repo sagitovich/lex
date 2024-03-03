@@ -35,6 +35,8 @@ def group_is_open(data):
     try:
         if data['response'][0]['activity'] == 'Closed community':
             return False
+        else:
+            return True
     except KeyError:
         return True
 
@@ -95,7 +97,7 @@ def take_country_of_group(data):
 
 def take_contacts_of_group(data):
     try:
-        contacts = ''
+        contacts = '\n'
         items = data['response'][0]['contacts']
         for item in items:
             temp_data = take_user_data(str(item['user_id']))
@@ -114,13 +116,17 @@ def return_all_group_main_data(domain):
             name = f'Название: {take_name_of_group(data)}'
             followers = f'Количество подписчиков: {take_count_of_followers(data)}'
             location = f'Местоположение: {take_country_of_group(data)}, {take_city_of_group(data)}'
-            contacts = f'Контакты: \n{take_contacts_of_group(data)}'
+            contacts = f'Контакты: {take_contacts_of_group(data)}'
             url = f'Ссылка на группу: {make_url_to_group(data)}'
 
-            info += (name + '\n' + followers + '\n' + location + '\n' + contacts + url + '\n')
+            info += (name + '\n' + followers + '\n' + location + '\n' + contacts + '\n' + url + '\n')
             return info
         else:
             return False
 
     except (KeyError, IndexError, TypeError):
         return False
+
+
+temp = group_is_open(take_group_data('klops39'))
+print()

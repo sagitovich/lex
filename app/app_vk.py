@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.insert(0, '/Users/a.sagitovich/programming/BFU/lex/vk_lex')
 
-from PyQt5 import uic, QtWidgets
+from PyQt5 import uic, QtWidgets, QtGui
 from PyQt5.QtCore import pyqtSignal, QThread, QDate, QDateTime
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget
 
@@ -12,6 +12,7 @@ from vk_lex.getGroupFollowers import take_group_followers_url_name
 from vk_lex.userMainDataVK import return_all_user_info, take_user_data, user_empty
 from vk_lex.userSubscriptionsVK import take_user_subscriptions_data, take_user_group_url_name
 from vk_lex.groupMainDataVK import return_all_group_main_data, group_empty, take_group_data, group_is_open
+from vk_lex.getCommentsFromGroup import return_comments_group_no_filter
 
 
 # noinspection PyUnresolvedReferences
@@ -33,6 +34,7 @@ class vk_Functional(QMainWindow):
         self.mainGroup_btn.clicked.connect(self.mainGroup_open)
         self.followersGroup_btn.clicked.connect(self.followersGroup_open)
         self.postsGroup_btn.clicked.connect(self.postsGroup_open)
+        self.commGroup_btn.clicked.connect(self.groupAllComm_open)
 
     def mainUser_open(self):
         user_main = vk_UserMain(self)
@@ -68,6 +70,11 @@ class vk_Functional(QMainWindow):
         group_posts = vk_GroupPosts(self)
         self.info.addWidget(group_posts)
         self.info.setCurrentWidget(group_posts)
+
+    def groupAllComm_open(self):
+        group_comm = vk_GroupAllComments(self)
+        self.info.addWidget(group_comm)
+        self.info.setCurrentWidget(group_comm)
 
 
 # noinspection PyUnresolvedReferences
@@ -278,7 +285,10 @@ class vk_UserPosts(QWidget):
             self.error_msg.setText('введите пользователя')
 
     def update_label(self, text):
+        scrollbar = self.posts_info.verticalScrollBar()
+        scroll_position = scrollbar.value()  # сохраняем текущую позицию прокрутки
         self.posts_info.setText(text)
+        scrollbar.setValue(scroll_position)  # восстанавливаем позицию прокрутки
 
     def loading_finished(self):
         self.error_msg.setText("готово")
@@ -451,6 +461,7 @@ class vk_GroupPosts(QWidget):
         # self.click()
 
     def click(self):
+        self.setWindowTitle('VK-СООБЩЕСТВО-ЗАПИСИ')
         name = self.parent_window.input_url_group.text()
 
         date1 = QDateTime(self.old_date.date())
@@ -469,6 +480,9 @@ class vk_GroupPosts(QWidget):
                 if (not name) or (group_empty(take_group_data(name)) is False):
                     self.posts_info.setText('')
                     self.error_msg.setText('неверный домен или url группы')
+                elif not group_is_open(take_group_data(name)):
+                    self.posts_info.setText('')
+                    self.error_msg.setText('группа закрыта')
                 else:
                     self.error_msg.setText('')
                     self.vk_Posts_Writer = vk_Posts_Writer(name, start_date, end_date)
@@ -484,7 +498,10 @@ class vk_GroupPosts(QWidget):
             self.error_msg.setText('введите сообщество')
 
     def update_label(self, text):
+        scrollbar = self.posts_info.verticalScrollBar()
+        scroll_position = scrollbar.value()  # сохраняем текущую позицию прокрутки
         self.posts_info.setText(text)
+        scrollbar.setValue(scroll_position)  # восстанавливаем позицию прокрутки
 
     def loading_finished(self):
         self.error_msg.setText("готово")
@@ -496,6 +513,118 @@ class vk_GroupPosts(QWidget):
                 self.pause_btn.setText("Пауза")
             else:
                 self.vk_Posts_Writer.pause()
+                self.pause_btn.setText("Пуск")
+
+    def go_back(self):
+        self.close()
+        self.parent_window.show()
+        self.windowClosed.emit()
+
+
+# noinspection PyUnresolvedReferences
+class vk_GroupAllComm_Writer(QThread):
+    data_ready = pyqtSignal(str)
+    loading_finished = pyqtSignal()
+
+    def __init__(self, group_domain_, start_date_, end_date_):
+        super().__init__()
+        self.group_domain = group_domain_
+        self.start_date = start_date_
+        self.end_date = end_date_
+        self.is_paused = False
+
+    def run(self):
+        result = return_comments_group_no_filter(self.group_domain, self.start_date, self.end_date)
+        text = ''
+        for line in result:
+            for i in line:
+                text += (i + '\n')
+            text += (68 * '-' + '\n')
+            self.data_ready.emit(text)
+            if self.is_paused:
+                return
+        self.loading_finished.emit()
+
+    def pause(self):
+        self.is_paused = True
+
+    def resume(self):
+        self.is_paused = False
+        self.start()
+
+
+# noinspection PyUnresolvedReferences
+class vk_GroupAllComments(QWidget):
+    windowClosed = pyqtSignal()
+
+    def __init__(self, parent_window):
+        super().__init__()
+        self.vk_GroupAllComm = None
+        uic.loadUi('vkGroupComm.ui', self)
+
+        self.old_date.setDate(QDate.currentDate().addMonths(-1))
+        self.cur_date.setDate(QDate.currentDate())
+
+        self.update_info.clicked.connect(self.click)
+        self.pause_btn.clicked.connect(self.pause_or_resume)
+
+        self.parent_window = parent_window
+        self.back_btn.clicked.connect(self.go_back)
+
+    def click(self):
+        self.setWindowTitle('VK-СООБЩЕСТВО-КОММЕНТАРИИ')
+
+        name = self.parent_window.input_url_group.text()
+        date1 = QDateTime(self.old_date.date())
+        date2 = QDateTime(self.cur_date.date())
+
+        # Конвертировать QDateTime в unix timestamp
+        start_date = date1.toSecsSinceEpoch()
+        end_date = date2.toSecsSinceEpoch()
+        cur_date = QDate.currentDate()
+
+        if name != '':
+            self.error_msg.setText('')
+            self.comm_info.setText('')
+            if ((start_date <= QDateTime(cur_date).toSecsSinceEpoch()) and
+                    (end_date <= QDateTime(cur_date).toSecsSinceEpoch())):
+
+                if (not name) or (group_empty(take_group_data(name)) is False):
+                    self.comm_info.setText('')
+                    self.error_msg.setText('неверный домен или url группы')
+                elif not group_is_open(take_group_data(name)):
+                    self.comm_info.setText('')
+                    self.error_msg.setText('группа закрыта')
+                else:
+                    self.error_msg.setText('')
+                    self.vk_GroupAllComm = vk_GroupAllComm_Writer(name, start_date, end_date)
+                    self.vk_GroupAllComm.data_ready.connect(self.update_label)
+                    self.vk_GroupAllComm.loading_finished.connect(self.loading_finished)
+                    self.vk_GroupAllComm.start()
+                    self.error_msg.setText('идёт получение...')
+            else:
+                self.comm_info.setText('')
+                self.error_msg.setText('неверный временной диапазон')
+        else:
+            self.comm_info.setText('')
+            self.error_msg.setText('введите сообщество')
+
+    def update_label(self, text):
+        scrollbar = self.posts_info.verticalScrollBar()
+        scroll_position = scrollbar.value()  # сохраняем текущую позицию прокрутки
+        self.comm_info.setText(text)
+        scrollbar.setValue(scroll_position)  # восстанавливаем позицию прокрутки
+
+    def loading_finished(self):
+        self.error_msg.setText("готово")
+
+    def pause_or_resume(self):
+        if self.vk_GroupAllComm is not None:  # Добавить проверку на None
+            if self.vk_GroupAllComm.is_paused:
+                self.vk_GroupAllComm.resume()
+                self.pause_btn.setText("Пауза")
+            else:
+                self.vk_GroupAllComm.pause()
                 self.pause_btn.setText("Пуск")
 
     def go_back(self):
