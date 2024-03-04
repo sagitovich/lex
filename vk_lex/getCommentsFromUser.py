@@ -74,11 +74,10 @@ def take_comments_u(user_page, post_id, value_):
         pass
 
 
-def return_comments_user_no_filter(user_, days_):
-    ids = take_id_of_all_posts(take_page_data(user_, days_))
-    cnt = take_count_of_comments_of_all_posts(take_page_data(user_, days_))
+def return_comments_user_no_filter(user_, start_date_, end_date_):
+    ids = take_id_of_all_posts(take_page_data(user_, start_date_, end_date_))
+    cnt = take_count_of_comments_of_all_posts(take_page_data(user_, start_date_, end_date_))
 
-    aboba = 1
     for i, j in zip(ids, cnt):
         if j != 0:
             try:
@@ -103,15 +102,12 @@ def return_comments_user_no_filter(user_, days_):
                 pass
         else:
             pass
-        print(f"{aboba} запись проверена")
-        aboba += 1
 
 
-def return_comments_user_filter(user_, users_check, days_):
-    ids = take_id_of_all_posts(take_page_data(user_, days_))
-    cnt = take_count_of_comments_of_all_posts(take_page_data(user_, days_))
+def return_comments_user_filter(user_, users_check, start_date_, end_date_):
+    ids = take_id_of_all_posts(take_page_data(user_, start_date_, end_date_))
+    cnt = take_count_of_comments_of_all_posts(take_page_data(user_, start_date_, end_date_))
 
-    aboba = 1
     for i, j in zip(ids, cnt):
         if j != 0:
             try:
@@ -138,5 +134,3 @@ def return_comments_user_filter(user_, users_check, days_):
                 pass
         else:
             pass
-        print(f"{aboba} запись проверена")
-        aboba += 1
