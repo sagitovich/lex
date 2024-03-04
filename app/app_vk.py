@@ -244,7 +244,6 @@ class vk_UserPosts(QWidget):
         super().__init__()
         self.vk_Posts_Writer = None
         uic.loadUi('vkUserPosts.ui', self)
-        self.setWindowTitle('VK-ПОЛЬЗОВАТЕЛЬ-ЗАПИСИ')
 
         self.old_date.setDate(QDate.currentDate().addMonths(-1))
         self.cur_date.setDate(QDate.currentDate())
@@ -258,6 +257,10 @@ class vk_UserPosts(QWidget):
         # self.click()
 
     def click(self):
+
+        if self.vk_Posts_Writer is not None and self.vk_Posts_Writer.is_paused:
+            self.vk_Posts_Writer = None
+
         name = self.parent_window.input_url_user.text()
 
         date1 = QDateTime(self.old_date.date())
@@ -301,12 +304,9 @@ class vk_UserPosts(QWidget):
 
     def pause_or_resume(self):
         if self.vk_Posts_Writer is not None:  # Добавить проверку на None
-            if self.vk_Posts_Writer.is_paused:
-                self.vk_Posts_Writer.resume()
-                self.pause_btn.setText("Пауза")
-            else:
+            if not self.vk_Posts_Writer.is_paused:
                 self.vk_Posts_Writer.pause()
-                self.pause_btn.setText("Пуск")
+                self.error_msg.setText("сбор остановлен")
 
     def go_back(self):
         self.close()
@@ -588,10 +588,11 @@ class vk_GroupPosts(QWidget):
         self.parent_window = parent_window
         self.back_btn.clicked.connect(self.go_back)
 
-        # self.click()
-
     def click(self):
-        self.setWindowTitle('VK-СООБЩЕСТВО-ЗАПИСИ')
+
+        if self.vk_Posts_Writer is not None and self.vk_Posts_Writer.is_paused:
+            self.vk_Posts_Writer = None
+
         name = self.parent_window.input_url_group.text()
 
         date1 = QDateTime(self.old_date.date())
@@ -638,12 +639,9 @@ class vk_GroupPosts(QWidget):
 
     def pause_or_resume(self):
         if self.vk_Posts_Writer is not None:  # Добавить проверку на None
-            if self.vk_Posts_Writer.is_paused:
-                self.vk_Posts_Writer.resume()
-                self.pause_btn.setText("Пауза")
-            else:
+            if not self.vk_Posts_Writer.is_paused:
                 self.vk_Posts_Writer.pause()
-                self.pause_btn.setText("Пуск")
+                self.error_msg.setText("сбор остановлен")
 
     def go_back(self):
         self.close()
@@ -702,7 +700,9 @@ class vk_GroupAllComments(QWidget):
         self.back_btn.clicked.connect(self.go_back)
 
     def click(self):
-        self.setWindowTitle('VK-СООБЩЕСТВО-КОММЕНТАРИИ')
+
+        if self.vk_GroupAllComm is not None and self.vk_GroupAllComm.is_paused:
+            self.vk_GroupAllComm = None
 
         name = self.parent_window.input_url_group.text()
         date1 = QDateTime(self.old_date.date())
@@ -750,12 +750,9 @@ class vk_GroupAllComments(QWidget):
 
     def pause_or_resume(self):
         if self.vk_GroupAllComm is not None:  # Добавить проверку на None
-            if self.vk_GroupAllComm.is_paused:
-                self.vk_GroupAllComm.resume()
-                self.pause_btn.setText("Пауза")
-            else:
+            if not self.vk_GroupAllComm.is_paused:
                 self.vk_GroupAllComm.pause()
-                self.pause_btn.setText("Пуск")
+                self.error_msg.setText("сбор остановлен")
 
     def go_back(self):
         self.close()

@@ -240,7 +240,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Пауза</string>
+        <string>Стоп</string>
        </property>
       </widget>
      </item>
@@ -261,7 +261,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Получить</string>
+        <string>Запуск</string>
        </property>
        <property name="shortcut">
         <string>Return</string>
