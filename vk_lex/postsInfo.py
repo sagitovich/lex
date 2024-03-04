@@ -98,8 +98,3 @@ def return_posts(domain, start_date, end_date):
     except (KeyError, IndexError):
         return False
 
-#
-# temp = return_posts('v_d_n_h', 1619733600, 1621634400)
-# for i in temp:
-#     for j in i:
-#         print(j)
