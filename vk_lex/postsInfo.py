@@ -89,10 +89,10 @@ def return_posts(domain, start_date, end_date):
                     except (KeyError, IndexError, TypeError):
                         author = f"https://vk.com/id{str(post['from_id'])}"
 
-                yield [f'Дата публикации: {date}',
-                       f'Ссылка на запись: {url}',
+                yield [f'Автор: {author}',
+                       f'Дата публикации: {date}',
                        f'Текст: {text}',
-                       f'Автор: {author}']
+                       f'Ссылка на запись: {url}']
         except (KeyError, IndexError):
             return False
     except (KeyError, IndexError):
