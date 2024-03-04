@@ -142,24 +142,3 @@ def return_comments_group_filter(group, users, start_date_, end_date_):
         print(f"{aboba} запись проверена")
         aboba += 1
 
-
-# group_ = 'https://vk.com/ruwest39'
-# list_ = ('https://vk.com/tiamat69',
-#             'https://vk.com/id818854585',
-#             'https://vk.com/id30859572',
-#             'https://vk.com/id767350920',
-#             'https://vk.com/id767350920',
-#             'https://vk.com/id114081738',
-#             'https://vk.com/a.a.chernikov',
-#             'https://vk.com/id44519599',
-#             'https://vk.com/id711060448',
-#             'https://vk.com/id573137191',
-#             'https://vk.com/id573137191',
-#             'https://vk.com/id608473493',
-#             'https://vk.com/kantt79',
-#             'https://vk.com/raslena',
-#             'https://vk.com/const2013',
-#             'https://vk.com/id30902015')
-# temp = return_comments_group_filter(group_, list_, 30)
-# for item in temp:
-#     print(item)
