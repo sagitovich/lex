@@ -90,10 +90,11 @@
         </property>
         <property name="font">
          <font>
-          <family>Arial</family>
-          <pointsize>16</pointsize>
+          <family>Century Gothic</family>
+          <pointsize>14</pointsize>
           <weight>75</weight>
           <bold>true</bold>
+          <kerning>true</kerning>
          </font>
         </property>
         <property name="text">
@@ -112,6 +113,13 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <family>Century Gothic</family>
+          <pointsize>9</pointsize>
+          <kerning>true</kerning>
+         </font>
+        </property>
        </widget>
       </item>
       <item>
@@ -124,6 +132,16 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Century Gothic</family>
+          <pointsize>9</pointsize>
+          <kerning>true</kerning>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>Основное</string>
@@ -141,6 +159,13 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <family>Century Gothic</family>
+          <pointsize>9</pointsize>
+          <kerning>true</kerning>
+         </font>
+        </property>
         <property name="text">
          <string>Друзья</string>
         </property>
@@ -153,6 +178,13 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Century Gothic</family>
+          <pointsize>9</pointsize>
+          <kerning>true</kerning>
+         </font>
         </property>
         <property name="text">
          <string>Подписки</string>
@@ -167,6 +199,13 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <family>Century Gothic</family>
+          <pointsize>9</pointsize>
+          <kerning>true</kerning>
+         </font>
+        </property>
         <property name="text">
          <string>Записи</string>
         </property>
@@ -179,6 +218,13 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Century Gothic</family>
+          <pointsize>9</pointsize>
+          <kerning>true</kerning>
+         </font>
         </property>
         <property name="text">
          <string>Комментарии</string>
@@ -249,10 +295,11 @@
         </property>
         <property name="font">
          <font>
-          <family>Arial</family>
-          <pointsize>16</pointsize>
+          <family>Century Gothic</family>
+          <pointsize>14</pointsize>
           <weight>75</weight>
           <bold>true</bold>
+          <kerning>true</kerning>
          </font>
         </property>
         <property name="text">
@@ -271,6 +318,13 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <family>Century Gothic</family>
+          <pointsize>9</pointsize>
+          <kerning>true</kerning>
+         </font>
+        </property>
        </widget>
       </item>
       <item>
@@ -280,6 +334,13 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Century Gothic</family>
+          <pointsize>9</pointsize>
+          <kerning>true</kerning>
+         </font>
         </property>
         <property name="text">
          <string>Основное</string>
@@ -294,6 +355,13 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <family>Century Gothic</family>
+          <pointsize>9</pointsize>
+          <kerning>true</kerning>
+         </font>
+        </property>
         <property name="text">
          <string>Подписчики</string>
         </property>
@@ -307,6 +375,13 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <family>Century Gothic</family>
+          <pointsize>9</pointsize>
+          <kerning>true</kerning>
+         </font>
+        </property>
         <property name="text">
          <string>Записи</string>
         </property>
@@ -319,6 +394,13 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Century Gothic</family>
+          <pointsize>9</pointsize>
+          <kerning>true</kerning>
+         </font>
         </property>
         <property name="text">
          <string>Комментарии</string>
@@ -398,6 +480,13 @@
         <height>32</height>
        </size>
       </property>
+      <property name="font">
+       <font>
+        <family>Century Gothic</family>
+        <pointsize>9</pointsize>
+        <kerning>true</kerning>
+       </font>
+      </property>
       <property name="text">
        <string>Назад</string>
       </property>
@@ -410,6 +499,9 @@
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
       <widget class="QWidget" name="info"/>
      </widget>

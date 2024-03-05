@@ -1,6 +1,6 @@
 import os
 import sys
-sys.path.insert(0, '/Users/a.sagitovich/programming/BFU/lex/vk_lex')
+sys.path.insert(0, 'C:\\Users\\lmuru\\PycharmProjects\\lex\\vk_lex')
 
 from PyQt5 import uic, QtWidgets
 from PyQt5.QtCore import pyqtSignal, QThread, QDate, QDateTime
@@ -89,7 +89,7 @@ class vk_UserMain(QWidget):
 
     def __init__(self, parent_window):
         super().__init__()
-        uic.loadUi('vkUserMain.ui', self)
+        uic.loadUi('vkUserMain_.ui', self)
         self.setWindowTitle('VK-ПОЛЬЗОВАТЕЛЬ-ОСНОВНОЕ')
 
         self.update_info.clicked.connect(self.click)
@@ -130,7 +130,7 @@ class vk_UserFriends(QWidget):
 
     def __init__(self, parent_window):
         super().__init__()
-        uic.loadUi('vkUserFriends.ui', self)
+        uic.loadUi('vkUserFriends_.ui', self)
         self.setWindowTitle('VK-ПОЛЬЗОВАТЕЛЬ-ДРУЗЬЯ')
 
         self.update_info.clicked.connect(self.click)
@@ -171,7 +171,7 @@ class vk_UserSubscriptions(QWidget):
 
     def __init__(self, parent_window):
         super().__init__()
-        uic.loadUi('vkUserSubscr.ui', self)
+        uic.loadUi('vkUserSubscr_.ui', self)
         self.setWindowTitle('VK-ПОЛЬЗОВАТЕЛЬ-ПОДПИСКИ')
 
         self.update_info.clicked.connect(self.click)
@@ -243,7 +243,7 @@ class vk_UserPosts(QWidget):
     def __init__(self, parent_window):
         super().__init__()
         self.vk_Posts_Writer = None
-        uic.loadUi('vkUserPosts.ui', self)
+        uic.loadUi('vkUserPosts_.ui', self)
 
         self.old_date.setDate(QDate.currentDate().addMonths(-1))
         self.cur_date.setDate(QDate.currentDate())
@@ -354,7 +354,7 @@ class vk_UserInGroupComm(QWidget):
     def __init__(self, parent_window):
         super().__init__()
         self.vk_UserInGroupComm = None
-        uic.loadUi('vkGroupComm.ui', self)
+        uic.loadUi('vkGroupComm_.ui', self)
 
         self.old_date.setDate(QDate.currentDate().addMonths(-1))
         self.cur_date.setDate(QDate.currentDate())
@@ -441,7 +441,7 @@ class vk_GroupMain(QWidget):
 
     def __init__(self, parent_window):
         super().__init__()
-        uic.loadUi('vkGroupMain.ui', self)
+        uic.loadUi('vkGroupMain_.ui', self)
         self.setWindowTitle('VK-СООБЩЕСТВО-ОСНОВНОЕ')
 
         self.update_info.clicked.connect(self.click)
@@ -512,7 +512,7 @@ class vk_GroupFollowers(QWidget):
 
     def __init__(self, parent_window):
         super().__init__()
-        uic.loadUi('vkGroupFollowers.ui', self)
+        uic.loadUi('vkGroupFollowers_.ui', self)
         self.vk_GroupFollowers_Writer = self
         self.setWindowTitle('VK-СООБЩЕСТВО-ПОДПИСЧИКИ')
 
@@ -576,7 +576,7 @@ class vk_GroupPosts(QWidget):
     def __init__(self, parent_window):
         super().__init__()
         self.vk_Posts_Writer = None
-        uic.loadUi('vkGroupPosts.ui', self)
+        uic.loadUi('vkGroupPosts_.ui', self)
         self.setWindowTitle('VK-СООБЩЕСТВО-ЗАПИСИ')
 
         self.old_date.setDate(QDate.currentDate().addMonths(-1))
@@ -688,7 +688,7 @@ class vk_GroupAllComments(QWidget):
     def __init__(self, parent_window):
         super().__init__()
         self.vk_GroupAllComm = None
-        uic.loadUi('vkGroupComm.ui', self)
+        uic.loadUi('vkGroupComm_.ui', self)
 
         self.old_date.setDate(QDate.currentDate().addMonths(-1))
         self.cur_date.setDate(QDate.currentDate())
@@ -762,6 +762,7 @@ class vk_GroupAllComments(QWidget):
 
 def main():
     os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+
     app = QApplication([])
     run = vk_Functional()
     run.show()
