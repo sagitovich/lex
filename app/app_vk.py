@@ -636,6 +636,8 @@ class vk_GroupPosts(QWidget):
 
     def loading_finished(self):
         self.error_msg.setText("готово")
+        text = self.posts_info.toPlainText()
+        print(text)
 
     def pause_or_resume(self):
         if self.vk_Posts_Writer is not None:  # Добавить проверку на None
