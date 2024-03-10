@@ -120,10 +120,13 @@ def take_user_web_site(data):
 
 def return_all_user_info(domain):
     data = take_user_data(domain)
-    url = f'Страница: https://vk.com/{take_user_domain(data)}'
-    name = f'Имя: {take_user_first_name(data)} {take_user_last_name(data)}'
-    bdate = f'Дата рождения: {take_user_birth_date(data)}'
-    city = f'Город: {take_user_city(data)}'
-    phone = f'Телефон: {take_user_mobile(data)}'
-    site = f'Сайт: {take_user_web_site(data)}'
-    return [url, name, bdate, city, phone, site]
+    user_info = {
+        'url': f'https://vk.com/{take_user_domain(data)}',
+        'name': f'{take_user_first_name(data)} {take_user_last_name(data)}',
+        'bdate': take_user_birth_date(data),
+        'city': take_user_city(data),
+        'phone': take_user_mobile(data),
+        'site': take_user_web_site(data)
+    }
+    return user_info
+

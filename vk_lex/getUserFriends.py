@@ -46,7 +46,3 @@ def take_friends_info(domain):
                 city = f'Город: нет данных'
             yield [url, name, bdate, city]
 
-#
-# info = take_friends_info('mureliz')
-# for i in info:
-#     print(*i)

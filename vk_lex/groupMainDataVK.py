@@ -97,30 +97,50 @@ def take_country_of_group(data):
 
 def take_contacts_of_group(data):
     try:
-        contacts = '\n'
+        contacts = ''
         items = data['response'][0]['contacts']
         for item in items:
             temp_data = take_user_data(str(item['user_id']))
             domain = take_user_domain(temp_data)
             contacts += f'  {item["desc"]} - https://vk.com/{domain}\n'
+        contacts = contacts.rstrip('\n')
     except KeyError:
         contacts = 'нет данных'
     return contacts
+
+
+# def return_all_group_main_data(domain):
+#     try:
+#         data = take_group_data(domain)
+#         if group_empty(data):
+#             info = ''
+#             name = f'Название: {take_name_of_group(data)}'
+#             followers = f'Количество подписчиков: {take_count_of_followers(data)}'
+#             location = f'Местоположение: {take_country_of_group(data)}, {take_city_of_group(data)}'
+#             contacts = f'Контакты: {take_contacts_of_group(data)}'
+#             url = f'Ссылка на группу: {make_url_to_group(data)}'
+#
+#             info += (name + '\n' + followers + '\n' + location + '\n' + contacts + '\n' + url + '\n')
+#             return info
+#         else:
+#             return False
+#
+#     except (KeyError, IndexError, TypeError):
+#         return False
 
 
 def return_all_group_main_data(domain):
     try:
         data = take_group_data(domain)
         if group_empty(data):
-            info = ''
-            name = f'Название: {take_name_of_group(data)}'
-            followers = f'Количество подписчиков: {take_count_of_followers(data)}'
-            location = f'Местоположение: {take_country_of_group(data)}, {take_city_of_group(data)}'
-            contacts = f'Контакты: {take_contacts_of_group(data)}'
-            url = f'Ссылка на группу: {make_url_to_group(data)}'
-
-            info += (name + '\n' + followers + '\n' + location + '\n' + contacts + '\n' + url + '\n')
-            return info
+            group_info = {
+                'name': take_name_of_group(data),
+                'followers': take_count_of_followers(data),
+                'location': f'{take_country_of_group(data)}, {take_city_of_group(data)}',
+                'contacts': take_contacts_of_group(data),
+                'url': make_url_to_group(data)
+            }
+            return group_info
         else:
             return False
 
@@ -128,5 +148,6 @@ def return_all_group_main_data(domain):
         return False
 
 
-temp = group_is_open(take_group_data('klops39'))
-print()
+info = return_all_group_main_data('klops39')
+for v in info.values():
+    print(*{v})
