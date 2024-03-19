@@ -1,156 +1,105 @@
 import time
-import requests
 import datetime
-import openpyxl
-from groupMainDataVK import take_group_data, take_group_id
-from userMainDataVK import take_user_data, take_user_domain
-from postsInfo import take_page_data, take_id_of_all_posts, take_count_of_comments_of_all_posts
+import requests
+from userMainDataVK import take_user_domain, take_user_data
+from groupMainDataVK import make_url_to_group, take_group_data
 
 
-def take_comments_g(group, post_id, value_):
+def take_page_data(domain, start_date, end_date):
+    if domain.startswith('https://vk.com/'):
+        domain = domain.split('/')[-1]
 
-    if group.startswith('https://vk.com/'):
-        group = group.split('/')[-1]
-
-    version = 5.131
     token = "4dacf0ee4dacf0ee4dacf0ee094eba6a9f44dac4dacf0ee28dbbdc4a23c5348e6580f16"
-
-    owner_id = -1 * int(take_group_id(take_group_data(group)))
-
-    count = 100
+    version = 5.92
+    count = 50
     offset = 0
 
-    value = value_
-    if value != 0:
-        while offset < value:
-            src = requests.get('https://api.vk.com/method/wall.getComments',
+    start_date_ = datetime.datetime.fromtimestamp(start_date).date()
+    end_date_ = datetime.datetime.fromtimestamp(end_date).date()
+
+    while offset < 100_000_000:
+        response = requests.get('https://api.vk.com/method/wall.get',
                                 params={
-                                    'owner_id': owner_id,
-                                    'post_id': post_id,
-                                    'count': count,
-                                    'offset': offset,
-                                    'extended': 1,
-                                    'fields': 'thread_items',
                                     'access_token': token,
-                                    'v': version
+                                    'v': version,
+                                    'domain': domain,
+                                    'count': count,
+                                    'offset': offset
                                 }
                                 )
-            try:
-                time.sleep(0.1)
-                data = src.json()['response']['items']
-
-                for key in data:
-                    yield key
-
-                    if 'thread' in key:
-                        thread_count = key['thread']['count']
-                        thread_offset = 0
-
-                        while thread_offset < thread_count:
-                            thread_src = requests.get('https://api.vk.com/method/wall.getComments',
-                                                        params={
-                                                            'owner_id': owner_id,
-                                                            'post_id': post_id,
-                                                            'comment_id': key['id'],
-                                                            'count': count,
-                                                            'offset': thread_offset,
-                                                            'extended': 1,
-                                                            'fields': 'items',
-                                                            'access_token': token,
-                                                            'v': version
-                                                        }
-                                                        )
-                            try:
-                                time.sleep(0.1)
-                                thread_items = thread_src.json()['response']['items']
-                                for item in thread_items:
-                                    yield item
-                            except KeyError:
-                                pass
-                            thread_offset += count
-                offset += count
-            except KeyError:
-                pass
-    else:
-        pass
+        data = response.json()['response']['items']
+        if not data:
+            break  # Прекратить, если нет новых записей
+        offset += 50
+        flag_end = False
+        for post in data:
+            post_date = datetime.datetime.fromtimestamp(post['date']).date()
+            if start_date_ <= post_date <= end_date_:
+                yield post  # возвращаем пост как только он удовлетворяет условию
+            else:
+                if (start_date_ <= post_date) and (post_date >= end_date_):
+                    pass
+                elif (start_date_ >= post_date) and (post_date <= end_date_):
+                    flag_end = True
+        if flag_end:  # если ничего не добавилось в all_posts -> следующие посты слишком старые
+            break
+        time.sleep(0.1)
 
 
-def take_groups(file='/Users/a.sagitovich/programming/BFU/TES/vk_tes/list_one.xlsx'):
-
-    book = openpyxl.load_workbook(file)
-    page = book.active
-
-    list_ = []
-    for i in page['C']:
-        if i.value is not None:
-            list_.append(i.value)
-    return list_
+def take_id_of_all_posts(data):
+    all_id = []
+    for item in data:
+        all_id.append(item['id'])
+    return all_id
 
 
-def return_comments_group_no_filter(group='klops39', days_=1):
-    ids = take_id_of_all_posts(take_page_data(group, days_))
-    cnt = take_count_of_comments_of_all_posts(take_page_data(group, days_))
-
-    aboba = 1
-    for i, j in zip(ids, cnt):
-        if j != 0:
-            try:
-                data = take_comments_g(group, i, j)
-                for key in data:
-                    user = take_user_domain(take_user_data(f'id{key["from_id"]}'))
-                    date = datetime.datetime.fromtimestamp(key['date']).strftime('%d.%m.%Y %H:%M:%S')
-                    text = key["text"]
-
-                    post_id = key.get("post_id", "")
-                    owner_id = key.get("owner_id", "")
-                    if post_id and owner_id:
-                        post = f'{group}?w=wall{owner_id}_{post_id}'
-                    else:
-                        post = f'{group}?w=wall{key.get("owner_id", "")}_{key.get("post_id", "")}'
-
-                    yield [f'Автор: {user}',
-                            f'Дата: {date}',
-                            f'Текст: {text}',
-                            f'Запись: {post}']
-            except (TypeError, IndexError, KeyError) as e:
-                print(e)
-                pass
-        else:
-            pass
-        print(f"{aboba} запись проверена")
-        aboba += 1
+def take_count_of_comments_of_all_posts(data):
+    all_comm = []
+    try:
+        for item in data:
+            all_comm.append(item['comments']['count'])
+        return all_comm
+    except KeyError:
+        return 'комментарии скрыты'
 
 
-def return_comments_group_filter(group='klops39', users=(), days_=1):
-    ids = take_id_of_all_posts(take_page_data(group, days_))
-    cnt = take_count_of_comments_of_all_posts(take_page_data(group, days_))
+def return_posts(domain, start_date, end_date):
+    try:
+        data = take_page_data(domain, start_date, end_date)
+        try:
+            for post in data:
+                date = datetime.datetime.fromtimestamp(post['date']).strftime('%d.%m.%Y %H:%M:%S')
+                url = f"https://vk.com/{str(domain)}?w=wall{str(post['owner_id'])}_{str(post['id'])}"
 
-    aboba = 1
-    for i, j in zip(ids, cnt):
-        if j != 0:
-            try:
-                data = take_comments_g(group, i, j)
-                for key in data:
-                    user = take_user_domain(take_user_data(f'id{key["from_id"]}'))
-                    date = datetime.datetime.fromtimestamp(key['date']).strftime('%d.%m.%Y %H:%M:%S')
-                    text = key["text"]
+                if (post['text'] == '') and (post['attachments'][0]['type'] == 'photo'):
+                    text = '*Фотография*'
+                elif (post['text'] == '') and (post['attachments'][0]['type'] == 'video'):
+                    text = '*Видео*'
+                else:
+                    text = post['text']
 
-                    post_id = key.get("post_id", "")
-                    owner_id = key.get("owner_id", "")
-                    if post_id and owner_id:
-                        post = f'{group}?w=wall{owner_id}_{post_id}'
-                    else:
-                        post = f'{group}?w=wall{key.get("owner_id", "")}_{key.get("post_id", "")}'
+                if post['owner_id'] > 0:  # если страница пользователя
+                    try:
+                        author = f"https://vk.com/{str(take_user_domain(take_user_data(domain)))}"
+                    except (KeyError, IndexError, TypeError):
+                        author = f"https://vk.com/id{str(post['from_id'])}"
+                else:  # если страница сообщества
+                    try:
+                        author = f"{make_url_to_group((take_group_data(domain)))}"
+                    except (KeyError, IndexError, TypeError):
+                        author = f"https://vk.com/id{str(post['from_id'])}"
 
-                    if user in users:
-                        yield [f'Автор: https://vk.com/{user}',
-                                f'Дата: {date}',
-                                f'Текст: {text}',
-                                f'Запись: {post}']
-            except (TypeError, IndexError, KeyError) as e:
-                print(e)
-                pass
-        else:
-            pass
-        print(f"{aboba} запись проверена\n")
-        aboba += 1
+                yield [f'Дата публикации: {date}',
+                       f'Ссылка на запись: {url}',
+                       f'Текст: {text}',
+                       f'Автор: {author}']
+        except (KeyError, IndexError):
+            return False
+    except (KeyError, IndexError):
+        return False
+
+#
+# temp = return_posts('v_d_n_h', 1619733600, 1621634400)
+# for i in temp:
+#     for j in i:
+#         print(j)
