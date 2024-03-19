@@ -1,12 +1,13 @@
 import time
 import requests
+from keys_vk import get_token
 from userMainDataVK import take_user_data, take_user_domain
 
 
-def take_group_data(domain):  # работает с url, id и доменом
+def take_group_data(domain):
     if ('https://vk.com/' in domain) or ('vk_tes.com/' in domain):
         domain = domain.split('/')[-1]
-    token = "4dacf0ee4dacf0ee4dacf0ee094eba6a9f44dac4dacf0ee28dbbdc4a23c5348e6580f16"
+    token = get_token()
     version = 5.131
     fields = 'activity, city, contacts, counters, country, description, links, members_count, start_date'
 
@@ -109,26 +110,6 @@ def take_contacts_of_group(data):
     return contacts
 
 
-# def return_all_group_main_data(domain):
-#     try:
-#         data = take_group_data(domain)
-#         if group_empty(data):
-#             info = ''
-#             name = f'Название: {take_name_of_group(data)}'
-#             followers = f'Количество подписчиков: {take_count_of_followers(data)}'
-#             location = f'Местоположение: {take_country_of_group(data)}, {take_city_of_group(data)}'
-#             contacts = f'Контакты: {take_contacts_of_group(data)}'
-#             url = f'Ссылка на группу: {make_url_to_group(data)}'
-#
-#             info += (name + '\n' + followers + '\n' + location + '\n' + contacts + '\n' + url + '\n')
-#             return info
-#         else:
-#             return False
-#
-#     except (KeyError, IndexError, TypeError):
-#         return False
-
-
 def return_all_group_main_data(domain):
     try:
         data = take_group_data(domain)
@@ -146,8 +127,3 @@ def return_all_group_main_data(domain):
 
     except (KeyError, IndexError, TypeError):
         return False
-
-
-info = return_all_group_main_data('klops39')
-for v in info.values():
-    print(*{v})

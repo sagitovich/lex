@@ -1,12 +1,13 @@
 # -*-  -*-  -*- #
 import time
 import requests
+from keys_vk import get_token
 
 
 def take_user_data(domain):
     if domain.startswith('https://vk.com/'):
         domain = domain.split('/')[-1]
-    token = "4dacf0ee4dacf0ee4dacf0ee094eba6a9f44dac4dacf0ee28dbbdc4a23c5348e6580f16"
+    token = get_token()
     version = 5.131
     fields = 'bdate, city, domain, contacts, site, sex'
 

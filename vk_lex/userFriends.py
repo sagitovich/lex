@@ -1,14 +1,15 @@
-import requests
 import time
+import requests
+from keys_vk import get_token
 from userMainDataVK import take_user_data, take_user_id
 
 
 def take_friends_data(domain):
     if domain.startswith('https://vk.com/'):
         domain = domain.split('/')[-1]
-    token = "4dacf0ee4dacf0ee4dacf0ee094eba6a9f44dac4dacf0ee28dbbdc4a23c5348e6580f16"
+    token = get_token()
     version = 5.131
-    fields = 'bdate, city, domain'  # имя, фамилия, дата рождения, город
+    fields = 'bdate, city, domain'
     count = 100
     offset = 0
 
@@ -29,20 +30,24 @@ def take_friends_data(domain):
         offset += count
 
 
-def take_friends_info(domain):
+def user_friends(domain):
     data = take_friends_data(domain)
 
     for element in data:
         for item in element:
-            url = f'Страница: https://vk.com/{item["domain"]}'
-            name = f'Имя: {item["first_name"]} {item["last_name"]}'
+            url = f'https://vk.com/{item["domain"]}'
+            name = f'{item["first_name"]} {item["last_name"]}'
             try:
-                bdate = f'Дата рождения: {item["bdate"]}'
+                bdate = f'{item["bdate"]}'
             except KeyError:
-                bdate = f'Дата рождения: нет данных'
+                bdate = f'нет данных'
             try:
-                city = f'Город: {item["city"]["title"]}'
+                city = f'{item["city"]["title"]}'
             except KeyError:
-                city = f'Город: нет данных'
-            yield [url, name, bdate, city]
-
+                city = f'нет данных'
+            yield {
+                'url': url,
+                'name': name,
+                'bdate': bdate,
+                'city': city
+            }

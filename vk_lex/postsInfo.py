@@ -1,6 +1,7 @@
 import time
 import datetime
 import requests
+from keys_vk import get_token
 from userMainDataVK import take_user_domain, take_user_data
 from groupMainDataVK import make_url_to_group, take_group_data
 
@@ -9,7 +10,7 @@ def take_page_data(domain, start_date, end_date):
     if domain.startswith('https://vk.com/'):
         domain = domain.split('/')[-1]
 
-    token = "4dacf0ee4dacf0ee4dacf0ee094eba6a9f44dac4dacf0ee28dbbdc4a23c5348e6580f16"
+    token = get_token()
     version = 5.92
     count = 50
     offset = 0
@@ -89,12 +90,14 @@ def return_posts(domain, start_date, end_date):
                     except (KeyError, IndexError, TypeError):
                         author = f"https://vk.com/id{str(post['from_id'])}"
 
-                yield [f'Автор: {author}',
-                       f'Дата публикации: {date}',
-                       f'Текст: {text}',
-                       f'Ссылка на запись: {url}']
+                yield {
+                    'author': {author},
+                    'date': {date},
+                    'text': {text},
+                    'url': {url}
+                }
+
         except (KeyError, IndexError):
             return False
     except (KeyError, IndexError):
         return False
-

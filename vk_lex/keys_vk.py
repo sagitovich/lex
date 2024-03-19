@@ -10,7 +10,3 @@ def get_token():
         '9253ecc49253ecc49253ecc40f91446e96992539253ecc4f7b9c95ee00c6a45915858b4'
     ]
     return choice(tokens)
-
-
-for _ in range(10):
-    print(get_token())
