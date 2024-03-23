@@ -1,7 +1,7 @@
 # -*-  -*-  -*- #
 import time
 import requests
-from keys_vk import get_token
+from .keys_vk import get_token
 
 
 def take_user_data(domain):
@@ -130,4 +130,3 @@ def return_all_user_info(domain):
         'site': take_user_web_site(data)
     }
     return user_info
-

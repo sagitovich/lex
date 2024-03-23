@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>lex_site</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'main/style.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'main/script.js' %}"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <h3>Пользователь</h3>
+        <input type="text" id="username" placeholder="Введите имя пользователя">
+        <button onclick="userInfo()">Информация</button>
+        <button onclick="userSubscriptions()">Подписки</button>
+        <button onclick="userFriends()">Друзья</button>
+        <button onclick="userPosts()">Записи</button>
+        <h3>Сообщество</h3>
+        <input type="text" id="groupname" placeholder="Введите название сообщества">
+        <button onclick="groupInfo()">Информация</button>
+        <button onclick="communitySubscribers()">Подписчики</button>
+        <button onclick="userComments()">Комментарии пользователя</button>
+        <button onclick="allComments()">Все комментарии</button>
+    </div>
+    <div class="content" id="content">
+        <!-- Здесь будет выводиться результат выполнения функций -->
+    </div>
+</body>
+</html>

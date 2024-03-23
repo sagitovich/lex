@@ -1,7 +1,7 @@
 import time
 import requests
-from keys_vk import get_token
-from userMainDataVK import take_user_data, take_user_domain
+from .keys_vk import get_token
+from .userMainDataVK import take_user_data, take_user_domain
 
 
 def take_group_data(domain):

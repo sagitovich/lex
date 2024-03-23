@@ -1,7 +1,7 @@
 import time
 import requests
-from keys_vk import get_token
-from userMainDataVK import take_user_id, take_user_data
+from .keys_vk import get_token
+from .userMainDataVK import take_user_id, take_user_data
 
 
 def take_user_subscriptions_data(domain):
