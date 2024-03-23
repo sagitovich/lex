@@ -1,7 +1,7 @@
 # -*-  -*-  -*- #
 import time
 import requests
-from .keys_vk import get_token
+from keys_vk import get_token
 
 
 def take_user_data(domain):
@@ -121,12 +121,17 @@ def take_user_web_site(data):
 
 def return_all_user_info(domain):
     data = take_user_data(domain)
-    user_info = {
-        'url': f'https://vk.com/{take_user_domain(data)}',
-        'name': f'{take_user_first_name(data)} {take_user_last_name(data)}',
-        'bdate': take_user_birth_date(data),
-        'city': take_user_city(data),
-        'phone': take_user_mobile(data),
-        'site': take_user_web_site(data)
-    }
-    return user_info
+    try:
+        user_info = {
+            'url': f'https://vk.com/{take_user_domain(data)}',
+            'name': f'{take_user_first_name(data)} {take_user_last_name(data)}',
+            'bdate': take_user_birth_date(data),
+            'city': take_user_city(data),
+            'phone': take_user_mobile(data),
+            'site': take_user_web_site(data)
+        }
+        return user_info
+
+    except (IndexError, KeyError):
+        return f'Пользователя https://vk.com/{domain} не существует.'
+
